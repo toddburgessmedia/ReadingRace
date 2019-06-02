@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Reading Race</string>
+    <string name="action_settings">Settings</string>
+    <string name="booklist_default_text">Start Reading Some Books</string>
+</resources>
