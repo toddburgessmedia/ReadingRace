@@ -11,6 +11,8 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener
 import com.squareup.picasso.Picasso
 import com.toddburgessmedia.mycameraapp.model.Book
+import com.toddburgessmedia.mycameraapp.model.BookUpdate
+import com.toddburgessmedia.mycameraapp.model.NewUser
 import kotlinx.android.synthetic.main.fragment_booklist.*
 import java.io.Serializable
 
@@ -38,9 +40,20 @@ class BookListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val bundle = arguments
+        val bookUpdate = arguments?.getParcelable("bookupdate") as BookUpdate
+
+        when (bookUpdate) {
+            NewUser -> {
+                booklist_rv.visibility = View.GONE
+                booklist_text.visibility = View.VISIBLE
+            }
+
+        }
+
+
 //        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(activity))
 
-//        val bundle = arguments
 //
 //
 //        val book = bundle?.getParcelable("book") as Book?

@@ -15,6 +15,7 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.toddburgessmedia.mycameraapp.model.Book
 import com.toddburgessmedia.mycameraapp.model.BookUpdate
+import com.toddburgessmedia.mycameraapp.model.NewUser
 
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.bookUpdateObserver.observe(this, Observer<BookUpdate> { bookUpdate ->
 
             when(bookUpdate) {
-                BookUpdate.NewUser -> { Log.d("mycamera","new user time")}
+                NewUser -> { Log.d("mycamera","new user time")}
             }
 
 

@@ -61,6 +61,7 @@
                 android:textSize="36sp"
                 android:gravity="center_horizontal|center_vertical"
                 android:text="@string/booklist_default_text"
+                android:id="@+id/booklist_text"
                 app:layout_constraintTop_toTopOf="@+id/constraint_booklist_adapter"
         />
 
