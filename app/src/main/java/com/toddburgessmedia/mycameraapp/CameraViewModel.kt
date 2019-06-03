@@ -14,10 +14,7 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.toddburgessmedia.mycameraapp.model.Book
-import com.toddburgessmedia.mycameraapp.model.BookFactory
-import com.toddburgessmedia.mycameraapp.model.BookUpdate
-import com.toddburgessmedia.mycameraapp.model.User
+import com.toddburgessmedia.mycameraapp.model.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -50,7 +47,7 @@ class CameraViewModel(application: Application) : AndroidViewModel(application),
             val request = bookFactory.getBookInfo(isbn).await()
             book = request
             book?.let {
-                val bookUpdate = BookUpdate.NewBook(book)
+                val bookUpdate = NewBook(book)
                 bookObserver.postValue(book)
             }
 
@@ -143,7 +140,7 @@ class CameraViewModel(application: Application) : AndroidViewModel(application),
                 .set(user)
                 .addOnSuccessListener {
                     Log.d("mycamera", "new user created")
-                    bookUpdateObserver.postValue(BookUpdate.NewUser)
+                    bookUpdateObserver.postValue(NewUser)
                 }
                 .addOnFailureListener { Log.d("mycamera", "failed to create user") }
         }
