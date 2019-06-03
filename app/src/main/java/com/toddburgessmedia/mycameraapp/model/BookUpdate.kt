@@ -1,8 +1,17 @@
 package com.toddburgessmedia.mycameraapp.model
 
-sealed class BookUpdate {
-    data class ReadingUpdate(val libraryList: List<Book>) : BookUpdate()
-    data class NewBook(var book: Book?) : BookUpdate()
-    object NewUser : BookUpdate()
-}
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+sealed class BookUpdate : Parcelable
+
+@Parcelize
+data class ReadingUpdate(val libraryList: List<Book>) : BookUpdate()
+
+@Parcelize
+data class NewBook(var book: Book?) : BookUpdate()
+
+@Parcelize
+object NewUser : BookUpdate()
+
 
