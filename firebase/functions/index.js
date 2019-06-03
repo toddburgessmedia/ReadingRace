@@ -27,9 +27,9 @@ exports.updateUserCount = functions.firestore
 			console.log('Transaction failure:', err);
 		  });
 		
-	});
+});
 
-	exports.deleteUserCount = functions.firestore
+exports.deleteUserCount = functions.firestore
 	.document('/readers/{userId}').onDelete((snap,context) => {
 		
 		console.log('new user deleted');
@@ -53,5 +53,4 @@ exports.updateUserCount = functions.firestore
 
 		
 		
-	});
-
+});
