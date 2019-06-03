@@ -18,16 +18,58 @@ exports.updateUserCount = functions.firestore
 		
 		console.log('new user created');
 
-		var userTotal = db.collection('readers').doc('user_count')
+		// const newTotal = 0;
+		var userTotal = db.collection('readers').doc('user_count');
 
-		console.log(userTotal["user_total"]);
-		var newTotal = userTotal["user_total"];
-		// var newTotal = userTotal.get().then(function(value) {
-		// 	console.log(value.user_total)
+		return userTotal.get()
+  			.then(doc => {
+    			if (!doc.exists) {
+					  console.log('No such document!');
+					  return null;
+    			} else {
+					  console.log('Document data:', doc.data());
+					  console.log(doc.data.user_total);
+					  var newTotal = doc.data().user_total;
+					  newTotal++
+					  console.log(newTotal);
+					  return userTotal.update({user_total : newTotal});
+				}
+  			})
+  			.catch(err => {
+    			console.log('Error getting document', err);
+  			});
 
-		// });
-		newTotal++; 
-		userTotal.update({user_total : newTotal});
-		return userTotal;
+		
+		
+	});
+
+	exports.deleteUserCount = functions.firestore
+	.document('/readers/{userId}').onDelete((snap,context) => {
+		
+		console.log('new user deleted');
+
+		// const newTotal = 0;
+		var userTotal = db.collection('readers').doc('user_count');
+
+		return userTotal.get()
+  			.then(doc => {
+    			if (!doc.exists) {
+					  console.log('No such document!');
+					  return null;
+    			} else {
+					  console.log('Document data:', doc.data());
+					  console.log(doc.data.user_total);
+					  var newTotal = doc.data().user_total;
+					  newTotal--;
+					  console.log(newTotal);
+					  return userTotal.update({user_total : newTotal});
+				}
+  			})
+  			.catch(err => {
+    			console.log('Error getting document', err);
+  			});
+
+		
+		
 	});
 
