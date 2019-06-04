@@ -13,8 +13,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.toddburgessmedia.mycameraapp.model.BookUpdate
-import com.toddburgessmedia.mycameraapp.model.NewUser
+import com.toddburgessmedia.mycameraapp.model.*
 
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
@@ -35,21 +34,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-//        viewModel.bookObserver.observe(this, Observer<Book> { book ->
-//
-//            supportFragmentManager
-//                .beginTransaction()
-//                .replace(R.id.frame_layout,BookListFragment.newInstance(book))
-//                .commit()
-//        })
-
         viewModel.bookUpdateObserver.observe(this, Observer<BookUpdate> { bookUpdate ->
 
-            when(bookUpdate) {
-                NewUser -> { startLogin()}
+                startLogin(bookUpdate)
+
+        })
+
+        viewModel.cameraObserver.observe(this, Observer<CameraAction> {
+
+            when (it) {
+                CameraStart -> { startCamera() }
             }
-
-
         })
 
         if (user != null) {
@@ -58,6 +53,14 @@ class MainActivity : AppCompatActivity() {
             loginNewUser()
         }
 
+    }
+
+    private fun startCamera() {
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.frame_layout, cameraFragment)
+            .commit()
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -76,23 +79,23 @@ class MainActivity : AppCompatActivity() {
 //        }
 //    }
 
-    override fun onStart() {
-        super.onStart()
-
-//        if (user != null) {
-//            startLogin()
-//        } else {
-//            loginNewUser()
-//        }
-
-    }
-
     private fun startLogin() {
-        cameraFragment.exitTransition = Slide(Gravity.TOP)
+        //cameraFragment.exitTransition = Slide(Gravity.TOP)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.frame_layout, BookListFragment.newInstance(NewUser))
             .commit()
+    }
+
+    private fun startLogin(bookUpdate: BookUpdate?) {
+        //cameraFragment.exitTransition = Slide(Gravity.TOP)
+
+        bookUpdate?.let {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.frame_layout, BookListFragment.newInstance(bookUpdate))
+                .commit()
+        }
     }
 
     fun loginNewUser() {
@@ -142,5 +145,6 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.frame_layout, LoginFragment.newInstance(bundle))
             .commit()
     }
+
 }
 

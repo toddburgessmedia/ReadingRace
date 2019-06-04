@@ -3,20 +3,24 @@ package com.toddburgessmedia.mycameraapp
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener
 import com.squareup.picasso.Picasso
-import com.toddburgessmedia.mycameraapp.model.Book
-import com.toddburgessmedia.mycameraapp.model.BookUpdate
-import com.toddburgessmedia.mycameraapp.model.NewUser
+import com.toddburgessmedia.mycameraapp.model.*
 import kotlinx.android.synthetic.main.fragment_booklist.*
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.io.Serializable
 
 class BookListFragment : Fragment() {
+
+    val viewModel : CameraViewModel by sharedViewModel()
 
     companion object {
 
@@ -44,11 +48,26 @@ class BookListFragment : Fragment() {
         val bookUpdate = arguments?.getParcelable("bookupdate") as BookUpdate
 
         when (bookUpdate) {
-            NewUser -> {
+            is NewUser -> {
                 booklist_rv.visibility = View.GONE
                 booklist_text.visibility = View.VISIBLE
             }
+            is ReadingUpdate -> {
+                booklist_rv.visibility = View.VISIBLE
+                booklist_text.visibility = View.GONE
 
+                val adapter = BookListAdapter(bookUpdate.libraryList)
+                booklist_rv.apply {
+                    layoutManager = LinearLayoutManager(activity)
+                    booklist_rv.adapter = adapter
+                }
+            }
+
+
+        }
+
+        booklist_fab.setOnClickListener {
+            viewModel.takePicture()
         }
 
 

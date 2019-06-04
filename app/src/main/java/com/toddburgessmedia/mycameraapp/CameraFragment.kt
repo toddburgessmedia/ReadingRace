@@ -49,9 +49,4 @@ class CameraFragment : Fragment() {
 
     }
 
-    override fun onPause() {
-        super.onPause()
-
-        frag_fab?.hide()
-    }
 }

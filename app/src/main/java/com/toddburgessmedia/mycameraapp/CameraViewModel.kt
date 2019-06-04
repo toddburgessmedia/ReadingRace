@@ -3,11 +3,9 @@ package com.toddburgessmedia.mycameraapp
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ml.vision.FirebaseVision
@@ -20,7 +18,7 @@ import kotlin.coroutines.CoroutineContext
 
 class CameraViewModel(application: Application) : AndroidViewModel(application), CoroutineScope {
 
-    var cameraBarCode = MutableLiveData<String>()
+    var cameraObserver = MutableLiveData<CameraAction>()
     var bookObserver = MutableLiveData<Book>()
 
     var bookUpdateObserver = MutableLiveData<BookUpdate>()
@@ -34,7 +32,6 @@ class CameraViewModel(application: Application) : AndroidViewModel(application),
 
 
 
-    public fun getBarCodes() = cameraBarCode
 
     public fun getBookInfo(isbn: String): Book? {
 
@@ -47,7 +44,9 @@ class CameraViewModel(application: Application) : AndroidViewModel(application),
             book = request
             book?.let {
                 val bookUpdate = NewBook(book)
-                bookObserver.postValue(book)
+                //bookObserver.postValue(book)
+                bookUpdateObserver.postValue(ReadingUpdate(listOf(it)))
+
             }
 
         }
@@ -77,13 +76,14 @@ class CameraViewModel(application: Application) : AndroidViewModel(application),
                     }
                 }
                 .addOnFailureListener {
-                    Log.d("mycamera", "We failed")
+                    cameraObserver.postValue(CameraFail)
                 }
                 .addOnCanceledListener {
-                    Log.d("mycamera", "cancelled")
+                    cameraObserver.postValue(CameraFail)
                 }
                 .addOnCompleteListener {
                     Log.d("mycamera", "complete")
+                    detector.close()
                 }
         }
 
@@ -94,12 +94,9 @@ class CameraViewModel(application: Application) : AndroidViewModel(application),
         val firebaseAnalytics = FirebaseAnalytics.getInstance(getApplication())
 
         launch {
-
             val bundle = Bundle()
             bundle.putString(FirebaseAnalytics.Param.ITEM_ID,isbn)
-
             firebaseAnalytics.logEvent("scan_book",bundle)
-
         }
     }
 
@@ -136,4 +133,7 @@ class CameraViewModel(application: Application) : AndroidViewModel(application),
     }
 
 
+    fun takePicture() {
+        cameraObserver.postValue(CameraStart)
+    }
 }
