@@ -46,11 +46,17 @@ class MainActivity : AppCompatActivity() {
         viewModel.bookUpdateObserver.observe(this, Observer<BookUpdate> { bookUpdate ->
 
             when(bookUpdate) {
-                NewUser -> { Log.d("mycamera","new user time")}
+                NewUser -> { startLogin()}
             }
 
 
         })
+
+        if (user != null) {
+            startLogin()
+        } else {
+            loginNewUser()
+        }
 
     }
 
@@ -73,11 +79,11 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        if (user != null) {
-            startLogin()
-        } else {
-            loginNewUser()
-        }
+//        if (user != null) {
+//            startLogin()
+//        } else {
+//            loginNewUser()
+//        }
 
     }
 
