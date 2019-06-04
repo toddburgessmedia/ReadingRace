@@ -4,20 +4,20 @@ import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.transition.Slide
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log
 import android.view.Gravity
-import android.view.Menu
-import android.view.MenuItem
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
-import com.toddburgessmedia.mycameraapp.model.Book
+import com.google.firebase.auth.FirebaseUser
 import com.toddburgessmedia.mycameraapp.model.BookUpdate
 import com.toddburgessmedia.mycameraapp.model.NewUser
 
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -25,9 +25,10 @@ class MainActivity : AppCompatActivity() {
     private val RC_SIGN_IN: Int = 99
     val cameraFragment = CameraFragment.newInstance()
 
+    private val auth : FirebaseAuth by inject()
     val viewModel : CameraViewModel by viewModel()
 
-    private lateinit var auth : FirebaseAuth
+    var user : FirebaseUser? = auth.currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +52,6 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        auth = FirebaseAuth.getInstance()
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -73,26 +73,26 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-
-        val currentUser = auth.currentUser
-        Log.d("mycamera","user ${currentUser?.displayName}")
-        currentUser?.displayName?.let {
-            cameraFragment.exitTransition = Slide(Gravity.TOP)
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.frame_layout, BookListFragment.newInstance(NewUser))
-                .commit()
-            Log.d("mycamera", "we are logged in")
-        } ?:
-           loginUser()
+        if (user != null) {
+            startLogin()
+        } else {
+            loginNewUser()
+        }
 
     }
 
-    fun loginUser() {
+    private fun startLogin() {
+        cameraFragment.exitTransition = Slide(Gravity.TOP)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.frame_layout, BookListFragment.newInstance(NewUser))
+            .commit()
+    }
+
+    fun loginNewUser() {
 
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
-            AuthUI.IdpConfig.AnonymousBuilder().build(),
             AuthUI.IdpConfig.GoogleBuilder().build())
 
         startActivityForResult(
@@ -107,31 +107,34 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == RC_SIGN_IN) {
-            val response = IdpResponse.fromResultIntent(data)
+        if ((requestCode == RC_SIGN_IN) && (resultCode == Activity.RESULT_OK)) {
+            user = auth.currentUser
 
-            if (resultCode == Activity.RESULT_OK) {
-
-                val user = FirebaseAuth.getInstance().currentUser
-
-                viewModel.userExists(user?.uid)
-
-                val bundle = Bundle()
-                bundle.putString("name",user?.displayName)
-                bundle.putString("email",user?.email)
-                bundle.putString("uid",user?.uid)
-
-                Log.d("mycamera", "user is ${user?.displayName}")
-                cameraFragment.exitTransition = Slide(Gravity.TOP)
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.frame_layout, LoginFragment.newInstance(bundle))
-                    .commit()
-                Log.d("mycamera", "we logged in")
+            if (!viewModel.userExists(user?.uid)) {
+                registerUser()
             } else {
-                Log.d("mycamera","we could not login")
+                startLogin()
             }
+        } else {
+            Snackbar.make(
+                findViewById(R.id.main_layout),
+                "Unable to connect to Internet",
+                Snackbar.LENGTH_SHORT
+            ).show()
         }
+    }
+
+    private fun registerUser() {
+
+        val bundle = Bundle()
+        bundle.putString("name", user?.displayName)
+        bundle.putString("email", user?.email)
+        bundle.putString("uid", user?.uid)
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.frame_layout, LoginFragment.newInstance(bundle))
+            .commit()
     }
 }
 

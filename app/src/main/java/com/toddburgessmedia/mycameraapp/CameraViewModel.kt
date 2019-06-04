@@ -29,7 +29,6 @@ class CameraViewModel(application: Application) : AndroidViewModel(application),
         FirebaseFirestore.getInstance()
     }
 
-
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
 
@@ -52,9 +51,7 @@ class CameraViewModel(application: Application) : AndroidViewModel(application),
             }
 
         }
-
         return null
-
     }
 
     fun getBarCode(bitMap: Bitmap) {
@@ -110,24 +107,16 @@ class CameraViewModel(application: Application) : AndroidViewModel(application),
 
         var found = false
 
-        if (uid == null) {
-            return false
-        }
-
-
         val doc = db.collection("readers").whereEqualTo("uid",uid)
 
         doc.get()
             .addOnSuccessListener { document ->
                 document?.let {
                     if (!document.isEmpty) {
-                        Log.d("mycamera", "user exists!!!!!!!! ")
                         found = true
                     } else {
-                        Log.d ("mycamera", "user does not exist")
                     }
-                } ?: Log.d ("mycamera", "user does not exist")
-
+                }
             }
 
         return found
