@@ -20,10 +20,10 @@ class BookListFragment : Fragment() {
 
     companion object {
 
-        fun newInstance(book : Book?) : BookListFragment {
+        fun newInstance(bookUpdate: BookUpdate) : BookListFragment {
 
             val bundle = Bundle()
-            bundle.putParcelable("book",book)
+            bundle.putParcelable("bookupdate",bookUpdate)
             val bookListFragment = BookListFragment()
             bookListFragment.arguments = bundle
             return bookListFragment

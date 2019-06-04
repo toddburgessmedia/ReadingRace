@@ -34,13 +34,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        viewModel.bookObserver.observe(this, Observer<Book> { book ->
-
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.frame_layout,BookListFragment.newInstance(book))
-                .commit()
-        })
+//        viewModel.bookObserver.observe(this, Observer<Book> { book ->
+//
+//            supportFragmentManager
+//                .beginTransaction()
+//                .replace(R.id.frame_layout,BookListFragment.newInstance(book))
+//                .commit()
+//        })
 
         viewModel.bookUpdateObserver.observe(this, Observer<BookUpdate> { bookUpdate ->
 
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             cameraFragment.exitTransition = Slide(Gravity.TOP)
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.frame_layout, BookListFragment.newInstance(null))
+                .replace(R.id.frame_layout, BookListFragment.newInstance(NewUser))
                 .commit()
             Log.d("mycamera", "we are logged in")
         } ?:
