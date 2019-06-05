@@ -13,9 +13,6 @@ object BookFactory {
 
     fun makeRetrofitService() : BookService {
 
-//        val moshi = Moshi.Builder().add(KotlinJ).build()
-
-
         return Retrofit.Builder()
             .baseUrl(URL)
             .addConverterFactory(MoshiConverterFactory.create())

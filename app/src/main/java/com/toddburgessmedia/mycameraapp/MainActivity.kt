@@ -36,14 +36,16 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.bookUpdateObserver.observe(this, Observer<BookUpdate> { bookUpdate ->
 
-                startLogin(bookUpdate)
-
+            when (bookUpdate) {
+                is NewUser -> startLogin(bookUpdate)
+            }
+//            startLogin(bookUpdate)
         })
 
         viewModel.cameraObserver.observe(this, Observer<CameraAction> {
 
             when (it) {
-                CameraStart -> { startCamera() }
+                is CameraStart -> { startCamera() }
             }
         })
 
@@ -63,24 +65,7 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.menu_main, menu)
-//        return true
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        return when (item.itemId) {
-//            R.id.action_settings -> true
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
-
     private fun startLogin() {
-        //cameraFragment.exitTransition = Slide(Gravity.TOP)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.frame_layout, BookListFragment.newInstance(NewUser))
@@ -88,7 +73,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startLogin(bookUpdate: BookUpdate?) {
-        //cameraFragment.exitTransition = Slide(Gravity.TOP)
 
         bookUpdate?.let {
             supportFragmentManager
