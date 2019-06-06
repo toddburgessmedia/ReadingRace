@@ -96,18 +96,27 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
 
     fun userExists(uid : String?) : Boolean {
 
-        return firestore.userExists(uid)
+        var exists = false
+
+        if (uid != null) {
+            val single = firestore.userExists(uid)
+                .doOnSuccess { b->
+                    exists = b
+                }
+
+            single.subscribe()
+        }
+
+        return exists
     }
 
     fun createUser(user: User) {
 
-        val single = firestore.createUser(user)
-            .doOnSuccess { b ->
-                if (b == true) {
-                    bookUpdateObserver.postValue(NewUser)
-                }
+        val complete = firestore.createUser(user)
+            .doOnComplete {
+                bookUpdateObserver.postValue(NewUser)
             }
-        single.subscribe()
+        complete.subscribe()
 
     }
 
