@@ -38,8 +38,8 @@ class MainActivity : AppCompatActivity() {
 
             when (bookUpdate) {
                 is NewUser -> startLogin(bookUpdate)
+                is RegisterUser -> registerUser()
             }
-//            startLogin(bookUpdate)
         })
 
         viewModel.cameraObserver.observe(this, Observer<CameraAction> {
@@ -103,11 +103,7 @@ class MainActivity : AppCompatActivity() {
         if ((requestCode == RC_SIGN_IN) && (resultCode == Activity.RESULT_OK)) {
             user = auth.currentUser
 
-            if (!viewModel.userExists(user?.uid)) {
-                registerUser()
-            } else {
-                startLogin()
-            }
+            viewModel.userExists(user?.uid)
         } else {
             Snackbar.make(
                 findViewById(R.id.main_layout),

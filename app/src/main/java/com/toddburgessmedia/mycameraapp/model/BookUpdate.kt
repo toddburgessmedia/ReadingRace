@@ -14,4 +14,7 @@ data class NewBook(var book: Book?) : BookUpdate()
 @Parcelize
 object NewUser : BookUpdate()
 
+@Parcelize
+object RegisterUser : BookUpdate()
+
 

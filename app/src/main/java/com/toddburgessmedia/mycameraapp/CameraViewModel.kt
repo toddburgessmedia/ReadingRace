@@ -16,6 +16,9 @@ import com.toddburgessmedia.mycameraapp.firebase.FireStoreModel
 import com.toddburgessmedia.mycameraapp.model.*
 import io.reactivex.Single
 import io.reactivex.SingleObserver
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -94,20 +97,21 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
         }
     }
 
-    fun userExists(uid : String?) : Boolean {
+    fun userExists(uid : String?) {
 
         var exists = false
 
         if (uid != null) {
             val single = firestore.userExists(uid)
-                .doOnSuccess { b->
-                    exists = b
+                .doOnSuccess { b ->
+                    if (b) {
+                        bookUpdateObserver.postValue(NewUser)
+                    } else {
+                        bookUpdateObserver.postValue(RegisterUser)
+                    }
                 }
-
-            single.subscribe()
+                .subscribe()
         }
-
-        return exists
     }
 
     fun createUser(user: User) {

@@ -36,6 +36,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
                 } catch (e : Throwable) {
                     emitter.onError(e)
                 }
+
             }
         }
 
