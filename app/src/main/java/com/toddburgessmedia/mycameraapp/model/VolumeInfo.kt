@@ -9,13 +9,14 @@ import kotlinx.android.parcel.Parcelize
 @JsonClass(generateAdapter = true)
 data class VolumeInfo (
 
-    val title : String? = null,
-    val subtitle : String? = null,
-    val publishedDate : String? = null,
+    val title : String?,
+    val subtitle : String?,
+    val publishedDate : String?,
     val authors : List<String>?,
-    val description : String? = null,
+    val description : String?,
     val pageCount : Int? = 0,
     val categories : List<String>?,
-    val imageLinks : ImageLink?
+    val imageLinks : ImageLink?,
+    val industryIdentifiers : List<IndustryIdentifier>?
 
 ) : Parcelable
