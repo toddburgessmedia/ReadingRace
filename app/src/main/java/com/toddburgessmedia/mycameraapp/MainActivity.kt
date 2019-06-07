@@ -5,7 +5,9 @@ import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.transition.Fade
 import android.support.transition.Slide
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log
 import android.view.Gravity
@@ -39,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             when (bookUpdate) {
                 is NewUser -> startLogin(bookUpdate)
                 is RegisterUser -> registerUser()
+                is ReadingUpdate -> startLogin(bookUpdate)
             }
         })
 

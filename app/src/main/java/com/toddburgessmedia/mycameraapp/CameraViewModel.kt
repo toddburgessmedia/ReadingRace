@@ -43,7 +43,6 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
             book = request
             book?.let {
                 val bookUpdate = NewBook(book)
-                //bookObserver.postValue(book)
                 bookUpdateObserver.postValue(ReadingUpdate(listOf(it)))
 
             }
