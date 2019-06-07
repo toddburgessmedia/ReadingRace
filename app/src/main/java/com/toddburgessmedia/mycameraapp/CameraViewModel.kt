@@ -31,6 +31,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
 
+    lateinit var user: User
 
     public fun getBookInfo(isbn: String): Book? {
 
@@ -43,6 +44,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
             book = request
             book?.let {
                 val bookUpdate = NewBook(book)
+                firestore.writeBookForUser(user,it)
                 bookUpdateObserver.postValue(ReadingUpdate(listOf(it)))
 
             }
@@ -113,6 +115,16 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
         }
     }
 
+    fun getUserFromDB (uid : String) {
+
+        val single = firestore.getUserInfoFromUID(uid)
+            .doOnSuccess { dbUser ->
+                user = dbUser
+                bookUpdateObserver.postValue(NewUser)
+            }
+            .subscribe()
+    }
+
     fun createUser(user: User) {
 
         val complete = firestore.createUser(user)
@@ -121,11 +133,6 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
             }
         complete.subscribe()
 
-    }
-
-    fun notifyUserCreated() {
-
-        bookUpdateObserver.postValue(NewUser)
     }
 
 
