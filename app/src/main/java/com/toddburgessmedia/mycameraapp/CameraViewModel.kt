@@ -29,11 +29,18 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
     var bookUpdateObserver = MutableLiveData<BookUpdate>()
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO
+        get() = Dispatchers.IO + SupervisorJob()
 
     lateinit var user: User
 
-    public fun getBookInfo(isbn: String): Book? {
+    override fun onCleared() {
+        super.onCleared()
+
+        coroutineContext.cancelChildren()
+    }
+
+
+    fun getBookInfo(isbn: String): Book? {
 
         val bookFactory = BookFactory.makeRetrofitService()
         var book: Book?
@@ -104,34 +111,44 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
 
         if (uid != null) {
             val single = firestore.userExists(uid)
-                .doOnSuccess { b ->
-                    if (b) {
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({exists ->
+                    if (exists) {
                         bookUpdateObserver.postValue(NewUser)
                     } else {
                         bookUpdateObserver.postValue(RegisterUser)
                     }
-                }
-                .subscribe()
+                }, {error ->
+                    Log.d("mycamera", "userExists ${error.localizedMessage}")
+                })
+
         }
     }
 
     fun getUserFromDB (uid : String) {
 
         val single = firestore.getUserInfoFromUID(uid)
-            .doOnSuccess { dbUser ->
-                user = dbUser
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({success ->
+                user = success
                 bookUpdateObserver.postValue(NewUser)
-            }
-            .subscribe()
+            }, {error ->
+                Log.d("mycamera","error access database")
+            })
     }
 
     fun createUser(user: User) {
 
         val complete = firestore.createUser(user)
+            .observeOn(AndroidSchedulers.mainThread())
             .doOnComplete {
                 bookUpdateObserver.postValue(NewUser)
             }
-        complete.subscribe()
+            .doOnError { t ->
+                Log.d("mycamera","unable to create user ${t.localizedMessage}")
+            }
+
+            complete.subscribe()
 
     }
 
