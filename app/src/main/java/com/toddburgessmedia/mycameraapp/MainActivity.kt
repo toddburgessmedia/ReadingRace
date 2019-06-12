@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         if (user != null) {
-            startLogin()
+            viewModel.userExists(user?.uid)
         } else {
             loginNewUser()
         }

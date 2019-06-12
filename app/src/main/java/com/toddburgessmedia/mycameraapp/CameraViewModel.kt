@@ -4,10 +4,8 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
 import android.graphics.Bitmap
-import android.os.Bundle
 import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
@@ -24,9 +22,13 @@ import kotlin.coroutines.CoroutineContext
 
 class CameraViewModel(application: Application, val firestore : FireStoreModel) : AndroidViewModel(application), CoroutineScope {
 
-    var cameraObserver = MutableLiveData<CameraAction>()
+    init {
+        firestore.viewModel = this
+    }
 
-    var bookUpdateObserver = MutableLiveData<BookUpdate>()
+    val cameraObserver = MutableLiveData<CameraAction>()
+
+    val bookUpdateObserver = MutableLiveData<BookUpdate>()
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + SupervisorJob()
@@ -51,8 +53,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
             book = request
             book?.let {
                 val bookUpdate = NewBook(book)
-                firestore.writeBookForUser(user,it)
-                bookUpdateObserver.postValue(ReadingUpdate(listOf(it)))
+                firestore.writeBookForUser(it)
 
             }
 
@@ -107,49 +108,25 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
 
     fun userExists(uid : String?) {
 
-        var exists = false
-
         if (uid != null) {
-            val single = firestore.userExists(uid)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({exists ->
-                    if (exists) {
-                        bookUpdateObserver.postValue(NewUser)
-                    } else {
-                        bookUpdateObserver.postValue(RegisterUser)
-                    }
-                }, {error ->
-                    Log.d("mycamera", "userExists ${error.localizedMessage}")
-                })
-
+            firestore.userExists(uid)
         }
+
     }
 
-    fun getUserFromDB (uid : String) {
+    fun getNextLoginStep(next : BookUpdate) {
 
-        val single = firestore.getUserInfoFromUID(uid)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({success ->
-                user = success
-                bookUpdateObserver.postValue(NewUser)
-            }, {error ->
-                Log.d("mycamera","error access database")
-            })
+        when (next) {
+            is RegisterUser -> {bookUpdateObserver.postValue(RegisterUser)}
+            is NewUser -> {bookUpdateObserver.postValue(NewUser)}
+            is ReadingUpdate -> {bookUpdateObserver.postValue(next)}
+        }
+
     }
 
     fun createUser(user: User) {
 
-        val complete = firestore.createUser(user)
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnComplete {
-                bookUpdateObserver.postValue(NewUser)
-            }
-            .doOnError { t ->
-                Log.d("mycamera","unable to create user ${t.localizedMessage}")
-            }
-
-            complete.subscribe()
-
+        firestore.createUser(user)
     }
 
 
