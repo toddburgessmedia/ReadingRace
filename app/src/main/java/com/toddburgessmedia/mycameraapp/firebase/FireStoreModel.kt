@@ -3,9 +3,7 @@ package com.toddburgessmedia.mycameraapp.firebase
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.*
 import com.toddburgessmedia.mycameraapp.CameraViewModel
 import com.toddburgessmedia.mycameraapp.model.*
 import io.reactivex.Completable
@@ -21,12 +19,14 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    var viewModel : CameraViewModel? = null
+    var viewModel: CameraViewModel? = null
 
-    lateinit var currentUser : User
+    var userReference: DocumentReference? = null
+
+    lateinit var currentUser: User
 
 
-    fun userExists(uid : String) {
+    fun userExists(uid: String) {
 
 
         val doc = db.collection("readers").document(uid)
@@ -54,7 +54,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
         }
     }
 
-    fun writeBookForUser(book : Book) {
+    fun writeBookForUser(book: Book) {
 
         val id = book.items[0].id
 
@@ -91,7 +91,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
         }
 
         userDB?.let { docRef ->
-            docRef.update("booksReading",FieldValue.arrayUnion(id))
+            docRef.update("booksReading", FieldValue.arrayUnion(id))
                 .addOnSuccessListener {
                     viewModel?.getNextLoginStep(ReadingUpdate(listOf(book)))
                 }
@@ -101,23 +101,36 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
     }
 
 
-    fun getUserInfoFromUID(uid : String) {
+    fun getUserInfoFromUID(uid: String?) {
 
-        var email : String?
-        var name : String?
-        var booksRead : Int
-        var user : User? = null
+        var email: String?
+        var name: String?
+        var booksRead: Int
+        var user: User? = null
 
-        val userDB = db.collection("readers").document(uid)
+        var userDB: DocumentReference? = null
 
-            userDB.get()
+
+        uid?.let {
+            userDB = db.collection("readers").document(uid)
+            userReference = db.collection("readers").document(uid)
+        }
+
+        userDB?.let {
+            it.get()
                 .addOnSuccessListener { task ->
-                    email = task.get("email").toString()
-                    name = task.get("name").toString()
-                    booksRead = task.get("booksRead").toString().toInt()
-                    currentUser = User(uid, email, name, booksRead)
+
+                    userReference?.addSnapshotListener { snapshot, e ->
+                        Log.d("mycamera", "user record updated ${snapshot?.data}")
+                        snapshot?.let {
+                            currentUser = UserUtility.createUser(snapshot)
+                        }
+                    }
+
+                    currentUser = UserUtility.createUser(task)
                     viewModel?.getNextLoginStep(NewUser)
                 }
-
+        }
     }
+
 }

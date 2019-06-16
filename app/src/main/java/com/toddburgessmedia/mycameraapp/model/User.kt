@@ -8,5 +8,6 @@ data class User (
     val uid : String?,
     val email : String?,
     val name : String?,
-    val booksRead : Int
+    val booksRead : Int,
+    val booksReading : List<String>? = null
 ) : Parcelable
