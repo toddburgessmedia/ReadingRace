@@ -3,6 +3,8 @@ package com.toddburgessmedia.mycameraapp.firebase
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.toddburgessmedia.mycameraapp.CameraViewModel
 import com.toddburgessmedia.mycameraapp.model.*
@@ -54,16 +56,48 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
 
     fun writeBookForUser(book : Book) {
 
-        val bookDB = db.collection("books")
+        val id = book.items[0].id
 
-        currentUser.uid?.let {
-            val userDB = db.collection("readers").document(it)
+        var bookDB: DocumentReference? = null
+
+        id?.let {
+            bookDB = db.collection("books").document(id)
         }
 
-        bookDB.add(book)
-            .addOnSuccessListener {
-                viewModel?.getNextLoginStep(ReadingUpdate(listOf(book)))
-            }
+
+        bookDB?.let { docRef ->
+            docRef.get()
+                .addOnSuccessListener { doc ->
+                    if (!doc.exists()) {
+                        docRef.set(book)
+                            .addOnSuccessListener {
+                                addBooktoUser(book)
+                            }
+                    } else {
+                        addBooktoUser(book)
+                    }
+                }
+        }
+    }
+
+    fun addBooktoUser(book: Book) {
+
+        val id = book.items[0].id
+        val uid = currentUser.uid
+        var userDB: DocumentReference? = null
+
+        uid?.let {
+            userDB = db.collection("readers").document(uid)
+        }
+
+        userDB?.let { docRef ->
+            docRef.update("booksReading",FieldValue.arrayUnion(id))
+                .addOnSuccessListener {
+                    viewModel?.getNextLoginStep(ReadingUpdate(listOf(book)))
+                }
+        }
+
+
     }
 
 
