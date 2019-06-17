@@ -2,16 +2,9 @@ package com.toddburgessmedia.mycameraapp.model
 
 import com.google.firebase.firestore.DocumentSnapshot
 
-class UserUtility {
-
-    companion object {
+object UserUtility {
 
         fun createUser(doc: DocumentSnapshot) : User {
-
-//            var uid : String?
-//            var email: String?
-//            var name: String?
-//            var booksRead: Int
 
             val uid = doc.get("uid").toString()
             val email = doc.get("email").toString()
@@ -22,11 +15,5 @@ class UserUtility {
             return User (uid,email,name,booksRead,booksReading)
 
         }
-
-
-
-
-
-    }
 
 }
