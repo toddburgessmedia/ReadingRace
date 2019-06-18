@@ -1,6 +1,6 @@
 package com.toddburgessmedia.mycameraapp
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +9,7 @@ import com.squareup.picasso.Picasso
 import com.toddburgessmedia.mycameraapp.model.Book
 import kotlinx.android.synthetic.main.booklist_adapter.view.*
 
-class BookListAdapter(val booklist : List<Book>) : RecyclerView.Adapter<BookListAdapter.BookViewHolder>() {
+class BookListAdapter(val booklist : List<Book>) : androidx.recyclerview.widget.RecyclerView.Adapter<BookListAdapter.BookViewHolder>() {
 
     var books = mutableListOf<Book>()
 
@@ -46,7 +46,7 @@ class BookListAdapter(val booklist : List<Book>) : RecyclerView.Adapter<BookList
 
     }
 
-    class BookViewHolder(v : View) : RecyclerView.ViewHolder(v) {
+    class BookViewHolder(v : View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v) {
 
         private var view = v
 

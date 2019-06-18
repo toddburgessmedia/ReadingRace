@@ -1,20 +1,21 @@
 package com.toddburgessmedia.mycameraapp
 
 import android.app.Activity
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.transition.Fade
-import android.support.transition.Slide
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity;
+import com.google.android.material.snackbar.Snackbar
+import androidx.transition.Fade
+import androidx.transition.Slide
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log
 import android.view.Gravity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.toddburgessmedia.mycameraapp.firebase.FCMManager
 import com.toddburgessmedia.mycameraapp.model.*
 
 import kotlinx.android.synthetic.main.activity_main.*
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     private val auth : FirebaseAuth by inject()
     val viewModel : CameraViewModel by viewModel()
+    val fcmMessaging : FCMManager by inject()
 
     var user : FirebaseUser? = auth.currentUser
 
@@ -57,7 +59,12 @@ class MainActivity : AppCompatActivity() {
         } else {
             loginNewUser()
         }
+    }
 
+    override fun onStart() {
+        super.onStart()
+
+        fcmMessaging.addAllSubcriptions()
     }
 
     private fun startCamera() {
