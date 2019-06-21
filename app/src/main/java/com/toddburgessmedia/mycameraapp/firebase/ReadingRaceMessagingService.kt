@@ -1,10 +1,10 @@
 package com.toddburgessmedia.mycameraapp.firebase
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.media.RingtoneManager
-import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.toddburgessmedia.mycameraapp.R
@@ -14,10 +14,14 @@ class ReadingRaceMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage?) {
         super.onMessageReceived(message)
 
-        Log.d("mycamera","we got a message from Firebase!!")
+        val channelID = this.getString(R.string.default_notification_channel_id)
+        val title = message?.notification?.title
 
-        val builder = NotificationCompat.Builder(this,"channel_id")
-            .setContentTitle(message?.notification?.title)
+        val channel = NotificationChannel(channelID,title,NotificationManager.IMPORTANCE_DEFAULT)
+        channel.description = message?.notification?.body
+
+        val builder = NotificationCompat.Builder(this,channelID)
+            .setContentTitle(title)
             .setContentText(message?.notification?.body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setStyle(NotificationCompat.BigTextStyle())
@@ -25,11 +29,10 @@ class ReadingRaceMessagingService : FirebaseMessagingService() {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setAutoCancel(true)
 
-        val notificationManager =  getSystemService(Context.NOTIFICATION_SERVICE)
-        when (notificationManager) {
-            is NotificationManagerCompat -> {
-                notificationManager.notify(0, builder.build())
-            }
-        }
+        val notificationManager =  getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+
+        notificationManager.notify(1, builder.build())
+
     }
 }

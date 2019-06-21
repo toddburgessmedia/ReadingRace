@@ -54,3 +54,16 @@ exports.deleteUserCount = functions.firestore
 		
 		
 });
+
+exports.sendNewBook = functions.firestore.document('/books/{bookId}').onCreate((snap,context) => {
+
+	const payload = {
+		notification: {
+			title : 'New Book Started',
+			body: 'Someone started reading a new book'
+		}
+	};
+
+	return admin.messaging().sendToTopic('newbook',payload);
+		
+});
