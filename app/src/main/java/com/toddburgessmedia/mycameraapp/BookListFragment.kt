@@ -14,6 +14,8 @@ class BookListFragment : Fragment() {
 
     val viewModel : CameraViewModel by sharedViewModel()
 
+//    var adapter : BookListAdapter? = null
+
     companion object {
 
         fun newInstance(bookUpdate: BookUpdate) : BookListFragment {
@@ -47,10 +49,9 @@ class BookListFragment : Fragment() {
                 booklist_text.visibility = View.GONE
 
                 val adapter = BookListAdapter(bookUpdate.libraryList)
-                booklist_rv.apply {
-                    layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
-                    booklist_rv.adapter = adapter
-                }
+                booklist_rv.layoutManager = LinearLayoutManager(activity)
+                booklist_rv.adapter = adapter
+
             }
         }
 

@@ -41,6 +41,26 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
             }
     }
 
+    fun userExistsRx(uid: String) : Single<Boolean> {
+
+
+        val doc = db.collection("readers").document(uid)
+
+        return Single.create { single ->
+            doc.get()
+                .addOnSuccessListener { task ->
+                    if (task.exists()) {
+                        //getUserInfoFromUID(uid)
+                        single.onSuccess(true)
+                    } else {
+                        //viewModel?.getNextLoginStep(RegisterUser)
+                        single.onSuccess(false)
+                    }
+                }
+        }
+    }
+
+
     fun createUser(user: User) {
 
         var success = false
@@ -103,11 +123,6 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
 
     fun getUserInfoFromUID(uid: String?) {
 
-        var email: String?
-        var name: String?
-        var booksRead: Int
-        var user: User? = null
-
         var userDB: DocumentReference? = null
 
 
@@ -128,9 +143,34 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
                     }
 
                     currentUser = UserUtility.createUser(task)
-                    viewModel?.getNextLoginStep(NewUser)
+                    //viewModel?.getNextLoginStep(NewUser)
+                    getAllBooksReading()
                 }
         }
     }
 
+    fun getAllBooksReading() {
+
+//        var bookListRef : DocumentReference? = null
+
+        val bookListRef = db.collection("books")
+        for (book in currentUser.booksReading.orEmpty()) {
+            Log.d("mycamera","${book}")
+            bookListRef.whereEqualTo("id",book)
+        }
+
+        bookListRef.get()
+            .addOnSuccessListener { querySnapShot ->
+                val bookList = mutableListOf<Book>()
+                var book : Book?
+
+                for (snap in querySnapShot) {
+                    Log.d("mycamera","processing book list")
+                    book = snap.toObject(Book::class.java)
+                    bookList.add(book)
+                }
+                viewModel?.getNextLoginStep(ReadingUpdate(bookList))
+            }
+
+    }
 }

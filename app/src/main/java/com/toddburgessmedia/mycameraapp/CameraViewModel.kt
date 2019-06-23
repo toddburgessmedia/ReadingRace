@@ -114,6 +114,29 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
 
     }
 
+    fun userExistsRx(uid : String?) {
+
+        var found = false
+
+        if (uid != null) {
+            firestore.userExistsRx(uid)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({onSuccess ->
+                    if (onSuccess) {
+                        Log.d("mycamera","user found")
+                        found = false
+                    } else {
+                        Log.d("mycamera","user not found")
+                    }
+            },{error ->
+                Log.d("mycamera", "error occured")
+            })
+
+
+        }
+
+    }
+
     fun getNextLoginStep(next : BookUpdate) {
 
         when (next) {

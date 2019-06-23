@@ -11,11 +11,11 @@ import kotlinx.android.synthetic.main.booklist_adapter.view.*
 
 class BookListAdapter(val booklist : List<Book>) : androidx.recyclerview.widget.RecyclerView.Adapter<BookListAdapter.BookViewHolder>() {
 
-    var books = mutableListOf<Book>()
+    val books = mutableListOf<Book>()
 
     init {
         books.addAll(booklist)
-        Log.d("mycamera", "${books.toString()}")
+        Log.d("mycamera", " size of books ${books.size}")
 
     }
 
@@ -35,16 +35,13 @@ class BookListAdapter(val booklist : List<Book>) : androidx.recyclerview.widget.
 
     }
 
-
-
     override fun getItemCount(): Int = books.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, p1: Int): BookViewHolder {
-
-        return BookViewHolder(LayoutInflater.from(parent.context)
+    override fun onCreateViewHolder(parent: ViewGroup, p1: Int): BookViewHolder =
+        BookViewHolder(LayoutInflater.from(parent.context)
                     .inflate(R.layout.booklist_adapter,parent,false))
 
-    }
+
 
     class BookViewHolder(v : View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v) {
 

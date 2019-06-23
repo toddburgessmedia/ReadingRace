@@ -8,7 +8,7 @@ import kotlinx.android.parcel.Parcelize
 @JsonClass(generateAdapter = true)
 data class Item (
 
-    val id : String? = null,
-    val volumeInfo : VolumeInfo?
+    var id : String? = null,
+    var volumeInfo : VolumeInfo? = null
 
 ) : Parcelable

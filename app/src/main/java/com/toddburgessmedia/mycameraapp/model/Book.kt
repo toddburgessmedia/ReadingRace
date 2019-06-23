@@ -9,7 +9,9 @@ import kotlinx.android.parcel.Parcelize
 @JsonClass(generateAdapter = true)
 data class Book (
 
-    val totalItems : Int?,
-    val items : List<Item>
+    var totalItems : Int?,
+    var items : List<Item> = emptyList()
 
-) : Parcelable
+) : Parcelable {
+    constructor() : this(0, emptyList())
+}
