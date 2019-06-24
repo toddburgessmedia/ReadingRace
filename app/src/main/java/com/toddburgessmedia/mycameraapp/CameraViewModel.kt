@@ -111,7 +111,30 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
     fun userExists(uid : String?) {
 
         if (uid != null) {
-            firestore.userExists(uid)
+            val result = firestore.userExistsRx(uid)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .flatMap { result ->
+                    getNextStepRx(result)
+                }
+                .subscribe { nextStep ->
+                    when (nextStep) {
+                        is RegisterUser -> bookUpdateObserver.postValue(RegisterUser)
+                        is ReadingUpdate -> bookUpdateObserver.postValue(nextStep)
+                    }
+                }
+
+            //result.dispose()
+        }
+
+    }
+
+    private fun getNextStepRx(result: Boolean) : Single<BookUpdate>{
+
+        if (result) {
+            return Single.just(ReadingUpdate(emptyList()))
+        } else {
+            return Single.just(RegisterUser)
         }
 
     }
@@ -126,6 +149,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
         }
 
     }
+
 
     fun createUser(user: User) {
 
