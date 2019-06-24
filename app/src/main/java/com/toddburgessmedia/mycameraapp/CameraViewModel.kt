@@ -53,7 +53,9 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
             book = request
             book?.let {
                 val bookUpdate = NewBook(book)
-                firestore.writeBookForUser(it)
+                if (it.items.isNotEmpty()) {
+                    firestore.writeBookForUser(it)
+                }
 
             }
 

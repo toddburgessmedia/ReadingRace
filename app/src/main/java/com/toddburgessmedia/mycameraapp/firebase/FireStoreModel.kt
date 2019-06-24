@@ -113,7 +113,8 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
         userDB?.let { docRef ->
             docRef.update("booksReading", FieldValue.arrayUnion(id))
                 .addOnSuccessListener {
-                    viewModel?.getNextLoginStep(ReadingUpdate(listOf(book)))
+                    //viewModel?.getNextLoginStep(ReadingUpdate(listOf(book)))
+                    getAllBooksReading()
                 }
         }
 
