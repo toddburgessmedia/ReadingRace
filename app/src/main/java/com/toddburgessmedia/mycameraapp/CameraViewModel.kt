@@ -120,7 +120,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
                 .subscribe { nextStep ->
                     when (nextStep) {
                         is RegisterUser -> bookUpdateObserver.postValue(RegisterUser)
-                        is ReadingUpdate -> bookUpdateObserver.postValue(nextStep)
+                        is ReadingUpdate -> firestore.getAllBooksReading()
                     }
                 }
 
@@ -153,7 +153,14 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
 
     fun createUser(user: User) {
 
-        firestore.createUser(user)
+        val result = firestore.createUserRx(user)
+            .doOnError {
+                Log.d("mycamera",it.localizedMessage)
+            }
+            .subscribe {
+                bookUpdateObserver.postValue(NewUser)
+            }
+
     }
 
 

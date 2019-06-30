@@ -49,4 +49,18 @@ class CameraFragment : Fragment() {
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        cameraView.stop()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        cameraView.start()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraView.destroy()
+    }
 }

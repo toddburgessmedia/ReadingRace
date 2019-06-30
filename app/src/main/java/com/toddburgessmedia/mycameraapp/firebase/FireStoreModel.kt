@@ -23,7 +23,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
 
     var userReference: DocumentReference? = null
 
-    lateinit var currentUser: User
+    var currentUser : User? = null
 
 
     fun userExists(uid: String) {
@@ -63,14 +63,32 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
 
     fun createUser(user: User) {
 
-        var success = false
-
         if (user.uid != null) {
             val doc = db.collection("readers").document(user.uid)
             doc.set(user)
                 .addOnSuccessListener {
                     viewModel?.getNextLoginStep(NewUser)
                 }
+        }
+    }
+
+    fun createUserRx(user: User) : Completable {
+
+        return Completable.create { emitter ->
+            if (user.uid != null) {
+                val doc = db.collection("readers").document(user.uid)
+
+                doc.set(user)
+                    .addOnSuccessListener {
+                        emitter.onComplete()
+                        //viewModel?.getNextLoginStep(NewUser)
+                    }
+                    .addOnFailureListener {
+                        emitter.onError(Throwable("Error saving to Firestore"))
+                    }
+            } else {
+                emitter.onError(Throwable("uid is null"))
+            }
         }
     }
 
@@ -103,7 +121,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
     fun addBooktoUser(book: Book) {
 
         val id = book.items[0].id
-        val uid = currentUser.uid
+        val uid = currentUser?.uid
         var userDB: DocumentReference? = null
 
         uid?.let {
@@ -155,7 +173,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
 //        var bookListRef : DocumentReference? = null
 
         val bookListRef = db.collection("books")
-        for (book in currentUser.booksReading.orEmpty()) {
+        for (book in currentUser?.booksReading.orEmpty()) {
             Log.d("mycamera","${book}")
             bookListRef.whereEqualTo("id",book)
         }
