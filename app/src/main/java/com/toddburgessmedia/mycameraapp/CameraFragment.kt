@@ -59,8 +59,5 @@ class CameraFragment : Fragment() {
         cameraView.start()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        cameraView.destroy()
-    }
+
 }

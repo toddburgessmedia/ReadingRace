@@ -12,6 +12,7 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOption
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.toddburgessmedia.mycameraapp.firebase.FireStoreModel
 import com.toddburgessmedia.mycameraapp.model.*
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -63,39 +64,81 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
         return null
     }
 
+    fun getBookInfoRx(isbn: String): Maybe<Book> {
+
+        val bookFactory = BookFactory.makeRetrofitService()
+
+        return Maybe.create { emitter ->
+            launch {
+                val request = bookFactory.getBookInfo(isbn).await()
+                val book = request
+                val bookUpdate = NewBook(book)
+                if (book.items.isNotEmpty()) {
+                        //firestore.writeBookForUser(it)
+                    Log.d("mycamera", "we found book ${book.toString()}")
+                    emitter.onSuccess(book)
+                } else {
+                    emitter.onError(Throwable("No Book found"))
+                }
+            }
+        }
+    }
+
+//    fun getBarCode(bitMap: Bitmap) {
+//
+//        val options = FirebaseVisionBarcodeDetectorOptions.Builder()
+//            .setBarcodeFormats(
+//                FirebaseVisionBarcode.FORMAT_EAN_13
+//            ).build()
+//
+//        Log.d("mycamera", "processing Image")
+//
+//        val image = FirebaseVisionImage.fromBitmap(bitMap)
+//
+//        val detector = FirebaseVision.getInstance().getVisionBarcodeDetector(options)
+//        image?.let { visionimage ->
+//            val result = detector.detectInImage(visionimage)
+//                .addOnSuccessListener { barcodes ->
+//                    if (barcodes.size > 0) {
+//                        barcodes[0]?.rawValue?.let {
+//                            getBookInfo(it)
+//                            firebaseConversion(it)
+//                        }
+//                    }
+//                }
+//                .addOnFailureListener {
+//                    cameraObserver.postValue(CameraFail)
+//                }
+//                .addOnCanceledListener {
+//                    cameraObserver.postValue(CameraFail)
+//                }
+//                .addOnCompleteListener {
+//                    Log.d("mycamera", "complete")
+//                    detector.close()
+//                }
+//        }
+//
+//    }
+
     fun getBarCode(bitMap: Bitmap) {
 
-        val options = FirebaseVisionBarcodeDetectorOptions.Builder()
-            .setBarcodeFormats(
-                FirebaseVisionBarcode.FORMAT_EAN_13
-            ).build()
+        val vision = ReadingRaceVision()
 
-        Log.d("mycamera", "processing Image")
-
-        val image = FirebaseVisionImage.fromBitmap(bitMap)
-
-        val detector = FirebaseVision.getInstance().getVisionBarcodeDetector(options)
-        image?.let { visionimage ->
-            val result = detector.detectInImage(visionimage)
-                .addOnSuccessListener { barcodes ->
-                    if (barcodes.size > 0) {
-                        barcodes[0]?.rawValue?.let {
-                            getBookInfo(it)
-                            firebaseConversion(it)
-                        }
-                    }
-                }
-                .addOnFailureListener {
-                    cameraObserver.postValue(CameraFail)
-                }
-                .addOnCanceledListener {
-                    cameraObserver.postValue(CameraFail)
-                }
-                .addOnCompleteListener {
-                    Log.d("mycamera", "complete")
-                    detector.close()
-                }
-        }
+        val result = vision.getBarCode(bitMap)
+            .flatMap { isbn ->
+                getBookInfoRx(isbn)
+            }
+            .flatMap {book ->
+                firestore.writeBookForUserRx(book)
+            }
+            .flatMapCompletable {
+                firestore.addBooktoUserRx(it)
+            }
+            .andThen(firestore.getAllBooksReadingRx())
+            .subscribe{ booksReading ->
+                Log.d("mycamera", "Rx version added book to user ${booksReading.toString()}")
+                bookUpdateObserver.postValue(ReadingUpdate(booksReading))
+            }
 
     }
 
@@ -120,7 +163,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
                 .subscribe { nextStep ->
                     when (nextStep) {
                         is RegisterUser -> bookUpdateObserver.postValue(RegisterUser)
-                        is ReadingUpdate -> firestore.getAllBooksReading()
+                        is ReadingUpdate -> firestore.getUserInfoFromUID(uid)
                     }
                 }
 

@@ -6,10 +6,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.*
 import com.toddburgessmedia.mycameraapp.CameraViewModel
 import com.toddburgessmedia.mycameraapp.model.*
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.SingleObserver
+import io.reactivex.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.CoroutineContext
@@ -118,6 +115,37 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
         }
     }
 
+    fun writeBookForUserRx(book: Book) : Maybe<Book> {
+
+        val id = book.items[0].id
+
+        var bookDB: DocumentReference? = null
+
+        id?.let {
+            bookDB = db.collection("books").document(id)
+        }
+
+
+        return Maybe.create { emitter ->
+            bookDB?.let { docRef ->
+                docRef.get()
+                    .addOnSuccessListener { doc ->
+                        if (!doc.exists()) {
+                            docRef.set(book)
+                                .addOnSuccessListener {
+                                    //addBooktoUser(book)
+                                    Log.d("mycamera","book written")
+                                    emitter.onSuccess(book)
+                                }
+                        } else {
+                            emitter.onComplete()
+                            //addBooktoUser(book)
+                        }
+                    }
+            }
+        }
+    }
+
     fun addBooktoUser(book: Book) {
 
         val id = book.items[0].id
@@ -139,6 +167,35 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
 
     }
 
+    fun addBooktoUserRx(book: Book) : Completable {
+
+        val id = book.items[0].id
+        val uid = currentUser?.uid
+        var userDB: DocumentReference? = null
+
+        uid?.let {
+            userDB = db.collection("readers").document(uid)
+        }
+
+        return Completable.create { emitter ->
+            userDB?.let { docRef ->
+                docRef.update("booksReading", FieldValue.arrayUnion(id))
+                    .addOnSuccessListener {
+                        //viewModel?.getNextLoginStep(ReadingUpdate(listOf(book)))
+                        emitter.onComplete()
+                        Log.d("mycamera","book added to user")
+                        //getAllBooksReading()
+                    }
+                    .addOnFailureListener {
+                        Log.d("mycamera","can't add to booksReading")
+                        emitter.onError(Throwable("unable to ad to booksReading"))
+                    }
+            }
+        }
+
+
+    }
+
 
     fun getUserInfoFromUID(uid: String?) {
 
@@ -153,7 +210,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
         userDB?.let {
             it.get()
                 .addOnSuccessListener { task ->
-
+                    //currentUser = UserUtility.createUser(task)
                     userReference?.addSnapshotListener { snapshot, e ->
                         Log.d("mycamera", "user record updated ${snapshot?.data}")
                         snapshot?.let {
@@ -170,7 +227,6 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
 
     fun getAllBooksReading() {
 
-//        var bookListRef : DocumentReference? = null
 
         val bookListRef = db.collection("books")
         for (book in currentUser?.booksReading.orEmpty()) {
@@ -190,6 +246,34 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
                 }
                 viewModel?.getNextLoginStep(ReadingUpdate(bookList))
             }
+
+    }
+
+    fun getAllBooksReadingRx() : Maybe<List<Book>> {
+
+
+        val bookListRef = db.collection("books")
+        for (book in currentUser?.booksReading.orEmpty()) {
+            Log.d("mycamera","${book}")
+            bookListRef.whereEqualTo("id",book)
+        }
+
+        return Maybe.create { emitter ->
+            bookListRef.get()
+                .addOnSuccessListener { querySnapShot ->
+                    val bookList = mutableListOf<Book>()
+                    var book: Book?
+
+                    for (snap in querySnapShot) {
+                        Log.d("mycamera", "processing book list")
+                        book = snap.toObject(Book::class.java)
+                        bookList.add(book)
+                    }
+                    //viewModel?.getNextLoginStep(ReadingUpdate(bookList))
+                    emitter.onSuccess(bookList)
+
+                }
+        }
 
     }
 }
