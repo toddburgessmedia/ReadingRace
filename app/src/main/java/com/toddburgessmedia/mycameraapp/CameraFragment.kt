@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.otaliastudios.cameraview.CameraListener
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.camera_layout.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -36,7 +35,7 @@ class CameraFragment : Fragment() {
         cameraView.addCameraListener(object : CameraListener() {
             override fun onPictureTaken(jpeg: ByteArray?) {
                 val bitmap = jpeg?.size?.let { BitmapFactory.decodeByteArray(jpeg, 0, it) }
-                bitmap?.let { viewModel.getBarCode(it) }
+                bitmap?.let { viewModel.addBookFromBitmap(it) }
             }
 
         })

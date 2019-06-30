@@ -6,17 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import android.graphics.Bitmap
 import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.toddburgessmedia.mycameraapp.firebase.FireStoreModel
 import com.toddburgessmedia.mycameraapp.model.*
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -42,29 +36,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
         coroutineContext.cancelChildren()
     }
 
-
-    fun getBookInfo(isbn: String): Book? {
-
-        val bookFactory = BookFactory.makeRetrofitService()
-        var book: Book?
-
-        launch {
-            val isbnQuery = "ISBN:" + isbn
-            val request = bookFactory.getBookInfo(isbn).await()
-            book = request
-            book?.let {
-                val bookUpdate = NewBook(book)
-                if (it.items.isNotEmpty()) {
-                    firestore.writeBookForUser(it)
-                }
-
-            }
-
-        }
-        return null
-    }
-
-    fun getBookInfoRx(isbn: String): Maybe<Book> {
+    fun getBookInfo(isbn: String): Maybe<Book> {
 
         val bookFactory = BookFactory.makeRetrofitService()
 
@@ -74,8 +46,6 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
                 val book = request
                 val bookUpdate = NewBook(book)
                 if (book.items.isNotEmpty()) {
-                        //firestore.writeBookForUser(it)
-                    Log.d("mycamera", "we found book ${book.toString()}")
                     emitter.onSuccess(book)
                 } else {
                     emitter.onError(Throwable("No Book found"))
@@ -84,55 +54,19 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
         }
     }
 
-//    fun getBarCode(bitMap: Bitmap) {
-//
-//        val options = FirebaseVisionBarcodeDetectorOptions.Builder()
-//            .setBarcodeFormats(
-//                FirebaseVisionBarcode.FORMAT_EAN_13
-//            ).build()
-//
-//        Log.d("mycamera", "processing Image")
-//
-//        val image = FirebaseVisionImage.fromBitmap(bitMap)
-//
-//        val detector = FirebaseVision.getInstance().getVisionBarcodeDetector(options)
-//        image?.let { visionimage ->
-//            val result = detector.detectInImage(visionimage)
-//                .addOnSuccessListener { barcodes ->
-//                    if (barcodes.size > 0) {
-//                        barcodes[0]?.rawValue?.let {
-//                            getBookInfo(it)
-//                            firebaseConversion(it)
-//                        }
-//                    }
-//                }
-//                .addOnFailureListener {
-//                    cameraObserver.postValue(CameraFail)
-//                }
-//                .addOnCanceledListener {
-//                    cameraObserver.postValue(CameraFail)
-//                }
-//                .addOnCompleteListener {
-//                    Log.d("mycamera", "complete")
-//                    detector.close()
-//                }
-//        }
-//
-//    }
-
-    fun getBarCode(bitMap: Bitmap) {
+    fun addBookFromBitmap(bitMap: Bitmap) {
 
         val vision = ReadingRaceVision()
 
         val result = vision.getBarCode(bitMap)
             .flatMap { isbn ->
-                getBookInfoRx(isbn)
+                getBookInfo(isbn)
             }
             .flatMap {book ->
-                firestore.writeBookForUserRx(book)
+                firestore.writeBookForUser(book)
             }
             .flatMapCompletable {
-                firestore.addBooktoUserRx(it)
+                firestore.addBooktoUser(it)
             }
             .andThen(firestore.getAllBooksReadingRx())
             .subscribe{ booksReading ->
@@ -154,9 +88,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
     fun userExists(uid : String?) {
 
         if (uid != null) {
-            val result = firestore.userExistsRx(uid)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
+            val result = firestore.userExists(uid)
                 .flatMap { result ->
                     getNextStepRx(result)
                 }
@@ -167,7 +99,6 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
                     }
                 }
 
-            //result.dispose()
         }
 
     }
@@ -196,7 +127,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
 
     fun createUser(user: User) {
 
-        val result = firestore.createUserRx(user)
+        val result = firestore.createUser(user)
             .doOnError {
                 Log.d("mycamera",it.localizedMessage)
             }

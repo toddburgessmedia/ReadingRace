@@ -23,22 +23,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
     var currentUser : User? = null
 
 
-    fun userExists(uid: String) {
-
-
-        val doc = db.collection("readers").document(uid)
-
-        doc.get()
-            .addOnSuccessListener { task ->
-                if (task.exists()) {
-                    getUserInfoFromUID(uid)
-                } else {
-                    viewModel?.getNextLoginStep(RegisterUser)
-                }
-            }
-    }
-
-    fun userExistsRx(uid: String) : Single<Boolean> {
+    fun userExists(uid: String) : Single<Boolean> {
 
 
         val doc = db.collection("readers").document(uid)
@@ -58,18 +43,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
     }
 
 
-    fun createUser(user: User) {
-
-        if (user.uid != null) {
-            val doc = db.collection("readers").document(user.uid)
-            doc.set(user)
-                .addOnSuccessListener {
-                    viewModel?.getNextLoginStep(NewUser)
-                }
-        }
-    }
-
-    fun createUserRx(user: User) : Completable {
+    fun createUser(user: User) : Completable {
 
         return Completable.create { emitter ->
             if (user.uid != null) {
@@ -89,33 +63,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
         }
     }
 
-    fun writeBookForUser(book: Book) {
-
-        val id = book.items[0].id
-
-        var bookDB: DocumentReference? = null
-
-        id?.let {
-            bookDB = db.collection("books").document(id)
-        }
-
-
-        bookDB?.let { docRef ->
-            docRef.get()
-                .addOnSuccessListener { doc ->
-                    if (!doc.exists()) {
-                        docRef.set(book)
-                            .addOnSuccessListener {
-                                addBooktoUser(book)
-                            }
-                    } else {
-                        addBooktoUser(book)
-                    }
-                }
-        }
-    }
-
-    fun writeBookForUserRx(book: Book) : Maybe<Book> {
+    fun writeBookForUser(book: Book) : Maybe<Book> {
 
         val id = book.items[0].id
 
@@ -146,28 +94,8 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
         }
     }
 
-    fun addBooktoUser(book: Book) {
 
-        val id = book.items[0].id
-        val uid = currentUser?.uid
-        var userDB: DocumentReference? = null
-
-        uid?.let {
-            userDB = db.collection("readers").document(uid)
-        }
-
-        userDB?.let { docRef ->
-            docRef.update("booksReading", FieldValue.arrayUnion(id))
-                .addOnSuccessListener {
-                    //viewModel?.getNextLoginStep(ReadingUpdate(listOf(book)))
-                    getAllBooksReading()
-                }
-        }
-
-
-    }
-
-    fun addBooktoUserRx(book: Book) : Completable {
+    fun addBooktoUser(book: Book) : Completable {
 
         val id = book.items[0].id
         val uid = currentUser?.uid
@@ -249,7 +177,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
 
     }
 
-    fun getAllBooksReadingRx() : Maybe<List<Book>> {
+    fun getAllBooksReadingRx() : Single<List<Book>> {
 
 
         val bookListRef = db.collection("books")
@@ -258,7 +186,7 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
             bookListRef.whereEqualTo("id",book)
         }
 
-        return Maybe.create { emitter ->
+        return Single.create { emitter ->
             bookListRef.get()
                 .addOnSuccessListener { querySnapShot ->
                     val bookList = mutableListOf<Book>()
