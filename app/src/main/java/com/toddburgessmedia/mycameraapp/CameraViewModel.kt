@@ -36,7 +36,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
         super.onCleared()
 
         coroutineContext.cancelChildren()
-        disposables.clear()
+        disposables.dispose()
     }
 
     fun getBookInfo(isbn: String): Maybe<Book> {
