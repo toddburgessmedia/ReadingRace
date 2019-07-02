@@ -109,14 +109,12 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
             userDB?.let { docRef ->
                 docRef.update("booksReading", FieldValue.arrayUnion(id))
                     .addOnSuccessListener {
-                        //viewModel?.getNextLoginStep(ReadingUpdate(listOf(book)))
                         emitter.onComplete()
                         Log.d("mycamera","book added to user")
-                        //getAllBooksReading()
                     }
-                    .addOnFailureListener {
+                    .addOnFailureListener {error ->
                         Log.d("mycamera","can't add to booksReading")
-                        emitter.onError(Throwable("unable to ad to booksReading"))
+                        emitter.onError(Throwable(error))
                     }
             }
         }
@@ -125,7 +123,8 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
     }
 
 
-    fun getUserInfoFromUID(uid: String?) {
+
+    fun getUserInfoFromUID(uid: String?) : Completable {
 
         var userDB: DocumentReference? = null
 
@@ -135,49 +134,29 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
             userReference = db.collection("readers").document(uid)
         }
 
-        userDB?.let {
-            it.get()
-                .addOnSuccessListener { task ->
-                    //currentUser = UserUtility.createUser(task)
-                    userReference?.addSnapshotListener { snapshot, e ->
-                        Log.d("mycamera", "user record updated ${snapshot?.data}")
-                        snapshot?.let {
-                            currentUser = UserUtility.createUser(snapshot)
+        return Completable.create {emitter ->
+            userDB?.let { doc ->
+                doc.get()
+                    .addOnSuccessListener { task ->
+                        userReference?.addSnapshotListener { snapshot, e ->
+                            Log.d("mycamera", "user record updated ${snapshot?.data}")
+                            snapshot?.let {
+                                currentUser = UserUtility.createUser(snapshot)
+                            }
                         }
+
+                        currentUser = UserUtility.createUser(task)
+                        emitter.onComplete()
                     }
+                    .addOnFailureListener {error ->
+                        emitter.onError(error)
 
-                    currentUser = UserUtility.createUser(task)
-                    //viewModel?.getNextLoginStep(NewUser)
-                    getAllBooksReading()
-                }
-        }
-    }
-
-    fun getAllBooksReading() {
-
-
-        val bookListRef = db.collection("books")
-        for (book in currentUser?.booksReading.orEmpty()) {
-            Log.d("mycamera","${book}")
-            bookListRef.whereEqualTo("id",book)
-        }
-
-        bookListRef.get()
-            .addOnSuccessListener { querySnapShot ->
-                val bookList = mutableListOf<Book>()
-                var book : Book?
-
-                for (snap in querySnapShot) {
-                    Log.d("mycamera","processing book list")
-                    book = snap.toObject(Book::class.java)
-                    bookList.add(book)
-                }
-                viewModel?.getNextLoginStep(ReadingUpdate(bookList))
+                    }
             }
-
+        }
     }
 
-    fun getAllBooksReadingRx() : Single<List<Book>> {
+    fun getAllBooksReading() : Single<List<Book>> {
 
 
         val bookListRef = db.collection("books")
@@ -197,9 +176,11 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
                         book = snap.toObject(Book::class.java)
                         bookList.add(book)
                     }
-                    //viewModel?.getNextLoginStep(ReadingUpdate(bookList))
                     emitter.onSuccess(bookList)
 
+                }
+                .addOnFailureListener {error ->
+                    emitter.onError(error)
                 }
         }
 

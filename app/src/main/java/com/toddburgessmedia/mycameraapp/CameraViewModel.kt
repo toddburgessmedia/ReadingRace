@@ -8,10 +8,9 @@ import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.toddburgessmedia.mycameraapp.firebase.FireStoreModel
 import com.toddburgessmedia.mycameraapp.model.*
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -59,33 +58,41 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
         val vision = ReadingRaceVision()
 
         val result = vision.getBarCode(bitMap)
+            .doOnError { Log.d ("mycamera","error occured ${it.localizedMessage}") }
             .flatMap { isbn ->
                 getBookInfo(isbn)
             }
+            .doOnError { Log.d ("mycamera","error occured ${it.localizedMessage}") }
             .flatMap {book ->
                 firestore.writeBookForUser(book)
             }
-            .flatMapCompletable {
-                firestore.addBooktoUser(it)
+            .flatMapCompletable { book ->
+                firestore.addBooktoUser(book)
             }
-            .andThen(firestore.getAllBooksReadingRx())
-            .subscribe{ booksReading ->
+            .andThen(firestore.getAllBooksReading())
+            .subscribe({ booksReading ->
                 Log.d("mycamera", "Rx version added book to user ${booksReading.toString()}")
                 bookUpdateObserver.postValue(ReadingUpdate(booksReading))
-            }
+            },{ error ->
+                Log.d("mycamera","error occured adding book ${error.localizedMessage}")
+                cameraObserver.postValue(CameraFail)
+            })
 
     }
 
-    fun firebaseConversion(isbn : String) {
+    fun firebaseConversion(isbn : String) : Completable {
 
         val firebaseAnalytics = FirebaseAnalytics.getInstance(getApplication())
 
-        launch {
-            firebaseAnalytics.logEvent("scan_book",null)
+        return Completable.create {emitter ->
+            launch {
+                firebaseAnalytics.logEvent("scan_book", null)
+            }
+            emitter.onComplete()
         }
     }
 
-    fun userExists(uid : String?) {
+    fun checkUserExists(uid : String?) {
 
         if (uid != null) {
             val result = firestore.userExists(uid)
@@ -95,11 +102,23 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
                 .subscribe { nextStep ->
                     when (nextStep) {
                         is RegisterUser -> bookUpdateObserver.postValue(RegisterUser)
-                        is ReadingUpdate -> firestore.getUserInfoFromUID(uid)
+//                        is ReadingUpdate -> firestore.getUserInfoFromUID(uid)
+                        is ReadingUpdate -> finishExistingUserLogin(uid)
+
                     }
                 }
-
         }
+    }
+
+    fun finishExistingUserLogin(uid : String) {
+
+        val result = firestore.getUserInfoFromUID(uid)
+            .andThen(firestore.getAllBooksReading())
+            .subscribe({bookList ->
+                bookUpdateObserver.postValue(ReadingUpdate(bookList))
+            },{error ->
+                Log.d("mycamera","something went wrong logging in")
+            })
 
     }
 
