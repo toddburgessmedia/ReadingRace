@@ -11,6 +11,7 @@ import com.toddburgessmedia.mycameraapp.model.*
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -24,6 +25,8 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
 
     val bookUpdateObserver = MutableLiveData<BookUpdate>()
 
+    val disposables = CompositeDisposable()
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + SupervisorJob()
 
@@ -33,6 +36,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
         super.onCleared()
 
         coroutineContext.cancelChildren()
+        disposables.clear()
     }
 
     fun getBookInfo(isbn: String): Maybe<Book> {
@@ -78,6 +82,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
                 cameraObserver.postValue(CameraFail)
             })
 
+        disposables.add(result)
     }
 
     fun firebaseConversion(isbn : String) : Completable {
@@ -107,6 +112,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
 
                     }
                 }
+            disposables.add(result)
         }
     }
 
@@ -120,6 +126,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
                 Log.d("mycamera","something went wrong logging in")
             })
 
+        disposables.add(result)
     }
 
     private fun getNextStepRx(result: Boolean) : Single<BookUpdate>{
@@ -128,17 +135,6 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
             return Single.just(ReadingUpdate(emptyList()))
         } else {
             return Single.just(RegisterUser)
-        }
-
-    }
-
-
-    fun getNextLoginStep(next : BookUpdate) {
-
-        when (next) {
-            is RegisterUser -> {bookUpdateObserver.postValue(RegisterUser)}
-            is NewUser -> {bookUpdateObserver.postValue(NewUser)}
-            is ReadingUpdate -> {bookUpdateObserver.postValue(next)}
         }
 
     }
@@ -154,6 +150,7 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
                 bookUpdateObserver.postValue(NewUser)
             }
 
+        disposables.add(result)
     }
 
 
