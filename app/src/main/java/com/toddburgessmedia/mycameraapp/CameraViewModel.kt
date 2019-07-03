@@ -62,7 +62,7 @@ class CameraViewModel(val firestore : FireStoreModel, val analytics: ReadingRace
 
         val result = vision.getBarCode(bitMap)
             .doOnError { Log.d ("mycamera","error occured ${it.localizedMessage}") }
-            .flatMap { isbn -> 
+            .flatMap { isbn ->
                 analytics.reportBookScan(isbn)
             }
             .flatMap { isbn ->

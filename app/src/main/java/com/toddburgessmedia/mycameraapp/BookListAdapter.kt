@@ -22,9 +22,9 @@ class BookListAdapter(val booklist : List<Book>) : androidx.recyclerview.widget.
     override fun onBindViewHolder(holder: BookViewHolder, index: Int) {
 
         val item = books[index].items[0]
-        holder.author.setText(item.volumeInfo?.title)
-        holder.title.setText(item.volumeInfo?.authors?.get(0))
-        holder.pagecount.setText(item.volumeInfo?.pageCount?.toString())
+        holder.author.setText(item.volumeInfo?.authors?.get(0))
+        holder.title.setText(item.volumeInfo?.title)
+        holder.pagecount.setText("${item.volumeInfo?.pageCount?.toString()} pages")
 
         Picasso
             .get()
