@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.toddburgessmedia.mycameraapp.firebase.FCMManager
 import com.toddburgessmedia.mycameraapp.firebase.FireStoreModel
+import com.toddburgessmedia.mycameraapp.firebase.ReadingRaceAnalytics
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
@@ -19,9 +20,11 @@ class MyApplication : Application() {
         single {FirebaseAnalytics.getInstance(this@MyApplication)}
         single {FirebaseFirestore.getInstance()}
         single {FirebaseMessaging.getInstance()}
+
         single {FireStoreModel(get())}
-        viewModel { CameraViewModel(this@MyApplication, get()) }
         single {FCMManager(get())}
+        single { ReadingRaceAnalytics(get()) }
+        viewModel { CameraViewModel(get(),get()) }
     }
 
 

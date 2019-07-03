@@ -1,4 +1,4 @@
-package com.toddburgessmedia.mycameraapp
+package com.toddburgessmedia.mycameraapp.firebase
 
 import android.graphics.Bitmap
 import android.util.Log
@@ -6,7 +6,6 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.toddburgessmedia.mycameraapp.model.CameraFail
 import io.reactivex.Maybe
 
 class ReadingRaceVision {

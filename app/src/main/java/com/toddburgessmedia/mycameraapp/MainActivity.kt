@@ -69,12 +69,6 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    private fun startLogin() {
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.frame_layout, BookListFragment.newInstance(NewUser))
-            .commit()
-    }
 
     private fun startLogin(bookUpdate: BookUpdate?) {
 

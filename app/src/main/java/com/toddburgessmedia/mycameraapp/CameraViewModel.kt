@@ -1,21 +1,20 @@
 package com.toddburgessmedia.mycameraapp
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import android.graphics.Bitmap
 import android.util.Log
-import com.google.firebase.analytics.FirebaseAnalytics
+import androidx.lifecycle.ViewModel
 import com.toddburgessmedia.mycameraapp.firebase.FireStoreModel
+import com.toddburgessmedia.mycameraapp.firebase.ReadingRaceAnalytics
+import com.toddburgessmedia.mycameraapp.firebase.ReadingRaceVision
 import com.toddburgessmedia.mycameraapp.model.*
-import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-class CameraViewModel(application: Application, val firestore : FireStoreModel) : AndroidViewModel(application), CoroutineScope {
+class CameraViewModel(val firestore : FireStoreModel, val analytics: ReadingRaceAnalytics) : ViewModel(), CoroutineScope {
 
     init {
         firestore.viewModel = this
@@ -63,6 +62,9 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
 
         val result = vision.getBarCode(bitMap)
             .doOnError { Log.d ("mycamera","error occured ${it.localizedMessage}") }
+            .flatMap { isbn -> 
+                analytics.reportBookScan(isbn)
+            }
             .flatMap { isbn ->
                 getBookInfo(isbn)
             }
@@ -85,17 +87,6 @@ class CameraViewModel(application: Application, val firestore : FireStoreModel) 
         disposables.add(result)
     }
 
-    fun firebaseConversion(isbn : String) : Completable {
-
-        val firebaseAnalytics = FirebaseAnalytics.getInstance(getApplication())
-
-        return Completable.create {emitter ->
-            launch {
-                firebaseAnalytics.logEvent("scan_book", null)
-            }
-            emitter.onComplete()
-        }
-    }
 
     fun checkUserExists(uid : String?) {
 
