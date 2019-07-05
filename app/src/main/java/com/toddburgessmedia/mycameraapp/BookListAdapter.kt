@@ -9,13 +9,12 @@ import com.squareup.picasso.Picasso
 import com.toddburgessmedia.mycameraapp.model.Book
 import kotlinx.android.synthetic.main.booklist_adapter.view.*
 
-class BookListAdapter(val booklist : List<Book>) : androidx.recyclerview.widget.RecyclerView.Adapter<BookListAdapter.BookViewHolder>() {
+class BookListAdapter(val booklist : List<Book>) : RecyclerView.Adapter<BookListAdapter.BookViewHolder>() {
 
     val books = mutableListOf<Book>()
 
     init {
         books.addAll(booklist)
-        Log.d("mycamera", " size of books ${books.size}")
 
     }
 
@@ -30,9 +29,6 @@ class BookListAdapter(val booklist : List<Book>) : androidx.recyclerview.widget.
             .get()
             .load(item.volumeInfo?.imageLinks?.thumbnail)
             .into(holder.image)
-
-        Log.d("mycamera","binding view")
-
     }
 
     override fun getItemCount(): Int = books.size
@@ -40,8 +36,6 @@ class BookListAdapter(val booklist : List<Book>) : androidx.recyclerview.widget.
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): BookViewHolder =
         BookViewHolder(LayoutInflater.from(parent.context)
                     .inflate(R.layout.booklist_adapter,parent,false))
-
-
 
     class BookViewHolder(v : View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v) {
 
