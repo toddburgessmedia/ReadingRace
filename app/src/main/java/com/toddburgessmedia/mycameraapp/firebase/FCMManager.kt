@@ -9,7 +9,7 @@ class FCMManager(val fireBaseMessaging : FirebaseMessaging) {
     fun addAllSubcriptions() {
 
         fireBaseMessaging.subscribeToTopic("newbook")
-            .addOnSuccessListener { Log.d("mycamera", "we subscribed") }
+//            .addOnSuccessListener { Log.d("mycamera", "we subscribed") }
 
     }
 
