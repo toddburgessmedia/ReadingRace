@@ -18,14 +18,15 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private val RC_SIGN_IN: Int = 99
+    public val RC_SIGN_IN: Int = 99
     val cameraFragment = CameraFragment.newInstance()
 
     private val auth : FirebaseAuth by inject()
     val viewModel : CameraViewModel by viewModel()
     val fcmMessaging : FCMManager by inject()
 
-    var user : FirebaseUser? = auth.currentUser
+//    var user : FirebaseUser? = auth.currentUser
+    var user : FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,17 +49,23 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        if (user != null) {
-            viewModel.checkUserExists(user?.uid)
-        } else {
-            loginNewUser()
-        }
+//        if (user != null) {
+//            viewModel.checkUserExists(user?.uid)
+//        } else {
+//            loginNewUser()
+//        }
     }
 
     override fun onStart() {
         super.onStart()
 
         fcmMessaging.addAllSubcriptions()
+
+        if (user != null) {
+            viewModel.checkUserExists(user?.uid)
+        } else {
+            loginNewUser()
+        }
     }
 
     private fun startCamera() {

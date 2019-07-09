@@ -16,13 +16,13 @@ import org.mockito.Mockito
 
 class MyTestApplication : Application() {
     val modules = module {
-        single { Mockito.mock(FirebaseAuth::class.java) }
-        single { FirebaseAnalytics.getInstance(this@MyTestApplication)}
-        single { Mockito.mock(FirebaseFirestore::class.java)}
-        single { FirebaseMessaging.getInstance()}
+        single { FirebaseAuth.getInstance() }
+        single {FirebaseAnalytics.getInstance(this@MyTestApplication)}
+        single {FirebaseFirestore.getInstance()}
+        single {FirebaseMessaging.getInstance()}
 
-        single { FireStoreModel(get()) }
-        single { FCMManager(get()) }
+        single {FireStoreModel(get())}
+        single {FCMManager(get())}
         single { ReadingRaceAnalytics(get()) }
         viewModel { CameraViewModel(get(),get()) }
     }
