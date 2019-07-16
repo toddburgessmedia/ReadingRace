@@ -61,26 +61,15 @@ class CameraViewModel(val firestore : FireStoreModel, val analytics: ReadingRace
         val vision = ReadingRaceVision()
 
         val result = vision.getBarCode(bitMap)
-            .doOnError { Log.d ("mycamera","error occured ${it.localizedMessage}") }
-            .flatMap { isbn ->
-                analytics.reportBookScan(isbn)
-            }
-            .flatMap { isbn ->
-                getBookInfo(isbn)
-            }
-            .doOnError { Log.d ("mycamera","error occured ${it.localizedMessage}") }
-            .flatMap {book ->
-                firestore.writeBookForUser(book)
-            }
-            .flatMapCompletable { book ->
-                firestore.addBooktoUser(book)
-            }
+            .flatMap { isbn -> analytics.reportBookScan(isbn) }
+            .flatMap { isbn -> getBookInfo(isbn) }
+            .flatMap { book -> firestore.writeBookForUser(book) }
+            .flatMapCompletable { book -> firestore.addBooktoUser(book) }
             .andThen(firestore.getAllBooksReading())
             .subscribe({ booksReading ->
-                Log.d("mycamera", "Rx version added book to user ${booksReading.toString()}")
                 bookUpdateObserver.postValue(ReadingUpdate(booksReading))
             },{ error ->
-                Log.d("mycamera","error occured adding book ${error.localizedMessage}")
+                Log.d("mycamera", "we had an error :( ${error.localizedMessage}")
                 cameraObserver.postValue(CameraFail)
             })
 
@@ -92,15 +81,11 @@ class CameraViewModel(val firestore : FireStoreModel, val analytics: ReadingRace
 
         if (uid != null) {
             val result = firestore.userExists(uid)
-                .flatMap { result ->
-                    getNextStepRx(result)
-                }
+                .flatMap { result -> getNextStepRx(result) }
                 .subscribe { nextStep ->
                     when (nextStep) {
                         is RegisterUser -> bookUpdateObserver.postValue(RegisterUser)
-//                        is ReadingUpdate -> firestore.getUserInfoFromUID(uid)
                         is ReadingUpdate -> finishExistingUserLogin(uid)
-
                     }
                 }
             disposables.add(result)
@@ -147,5 +132,9 @@ class CameraViewModel(val firestore : FireStoreModel, val analytics: ReadingRace
 
     fun takePicture() {
         cameraObserver.postValue(CameraStart)
+    }
+
+    fun userExistsCallBack(exists : Boolean) {
+
     }
 }

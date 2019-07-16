@@ -25,21 +25,41 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
 
     fun userExists(uid: String) : Single<Boolean> {
 
-
         val doc = db.collection("readers").document(uid)
 
         return Single.create { single ->
             doc.get()
                 .addOnSuccessListener { task ->
                     if (task.exists()) {
-                        //getUserInfoFromUID(uid)
                         single.onSuccess(true)
                     } else {
-                        //viewModel?.getNextLoginStep(RegisterUser)
                         single.onSuccess(false)
                     }
                 }
+                .addOnFailureListener { t ->
+                    single.onError(t)
+                }
         }
+    }
+
+    fun userExists(uid : String?) : Boolean {
+
+        var found = false
+
+        val doc = db.collection("readers").whereEqualTo("uid",uid)
+
+        doc.get()
+            .addOnSuccessListener { document ->
+                document?.let {
+                    if (!document.isEmpty) {
+                        viewModel?.userExistsCallBack(true)
+                    } else {
+                        viewModel?.userExistsCallBack(false)
+                    }
+                }
+            }
+
+        return found
     }
 
 

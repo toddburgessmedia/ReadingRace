@@ -25,8 +25,7 @@ class MainActivity : AppCompatActivity() {
     val viewModel : CameraViewModel by viewModel()
     val fcmMessaging : FCMManager by inject()
 
-//    var user : FirebaseUser? = auth.currentUser
-    var user : FirebaseUser? = null
+    var user : FirebaseUser? = auth.currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

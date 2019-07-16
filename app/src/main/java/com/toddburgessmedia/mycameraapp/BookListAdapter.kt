@@ -21,7 +21,7 @@ class BookListAdapter(val booklist : List<Book>) : RecyclerView.Adapter<BookList
     override fun onBindViewHolder(holder: BookViewHolder, index: Int) {
 
         val item = books[index].items[0]
-        holder.author.setText(item.volumeInfo?.authors?.get(0))
+        holder.author.setText(createAuthors(item.volumeInfo?.authors))
         holder.title.setText(item.volumeInfo?.title)
         holder.pagecount.setText("${item.volumeInfo?.pageCount?.toString()} pages")
 
@@ -29,6 +29,17 @@ class BookListAdapter(val booklist : List<Book>) : RecyclerView.Adapter<BookList
             .get()
             .load(item.volumeInfo?.imageLinks?.thumbnail)
             .into(holder.image)
+    }
+
+    fun createAuthors(authors : List<String>?) : String {
+
+        when (authors?.size) {
+            0 -> return "Unknown"
+            1 -> return authors[0]
+            else -> return "${authors?.get(0)} et. al"
+        }
+
+
     }
 
     override fun getItemCount(): Int = books.size
