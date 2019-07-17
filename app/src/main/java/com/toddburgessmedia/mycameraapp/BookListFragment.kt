@@ -36,8 +36,14 @@ class BookListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bundle = arguments
-        val bookUpdate = arguments?.getParcelable("bookupdate") as BookUpdate
+        var bookUpdate : BookUpdate? = null
+
+        if (savedInstanceState == null) {
+            bookUpdate = NewUser
+        } else {
+            val bundle = arguments
+            bookUpdate = arguments?.getParcelable("bookupdate") as BookUpdate
+        }
 
         when (bookUpdate) {
             is NewUser -> {

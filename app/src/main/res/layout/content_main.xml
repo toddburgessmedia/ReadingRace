@@ -14,7 +14,18 @@
         <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/frame_layout" />
+                android:id="@+id/frame_layout"
+                android:visibility="gone"
+        />
+
+        <fragment
+                android:id="@+id/nav_first_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.toddburgessmedia.mycameraapp.BookListFragment"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/navigation" />
+
 
 
 
