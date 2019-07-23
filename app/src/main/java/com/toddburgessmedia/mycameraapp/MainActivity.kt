@@ -4,8 +4,13 @@ import android.app.Activity
 import androidx.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -78,12 +83,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun startLogin(bookUpdate: BookUpdate?) {
 
-        bookUpdate?.let {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.frame_layout, BookListFragment.newInstance(bookUpdate))
-                .commit()
-        }
+        Activity().findNavController().navigate(R.id.booklist_destination,null)
+
+
+
+//        bookUpdate?.let {
+//            supportFragmentManager
+//                .beginTransaction()
+//                .replace(R.id.frame_layout, BookListFragment.newInstance(bookUpdate))
+//                .commit()
+//        }
     }
 
     fun loginNewUser() {

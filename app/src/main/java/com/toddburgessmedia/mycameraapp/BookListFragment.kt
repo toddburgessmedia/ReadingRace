@@ -36,7 +36,16 @@ class BookListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        var bookUpdate : BookUpdate? = null
+        addBookstoList(getBookUpdate(savedInstanceState))
+
+        booklist_fab.setOnClickListener {
+            viewModel.takePicture()
+        }
+    }
+
+    private fun getBookUpdate (savedInstanceState : Bundle?) : BookUpdate {
+
+        var bookUpdate: BookUpdate? = null
 
         if (savedInstanceState == null) {
             bookUpdate = NewUser
@@ -44,6 +53,12 @@ class BookListFragment : Fragment() {
             val bundle = arguments
             bookUpdate = arguments?.getParcelable("bookupdate") as BookUpdate
         }
+
+        return bookUpdate
+
+    }
+
+    private fun addBookstoList(bookUpdate : BookUpdate) {
 
         when (bookUpdate) {
             is NewUser -> {
@@ -59,10 +74,6 @@ class BookListFragment : Fragment() {
                 booklist_rv.adapter = adapter
 
             }
-        }
-
-        booklist_fab.setOnClickListener {
-            viewModel.takePicture()
         }
     }
 }
