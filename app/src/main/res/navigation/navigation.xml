@@ -11,15 +11,16 @@
                 <action
                         android:id="@+id/blank_to_booklist"
                         app:destination="@id/booklist_destination" />
-                        <argument
-                            android:name="booklist"
-                            app:argType="com.toddburgessmedia.mycameraapp.model.BookUpdate" />
             </fragment>
             <fragment
                 android:id="@+id/booklist_destination"
                 android:name="com.toddburgessmedia.mycameraapp.BookListFragment"
                 android:label="BookList"
-                />
+                >
+                <argument
+                    android:name="booklist"
+                    app:argType="com.toddburgessmedia.mycameraapp.model.BookUpdate" />
+            </fragment>
 
 
 </navigation>

@@ -1,2 +1,6 @@
 *.json
 /build
+/.idea/*
+/gradle/*
+gradlew
+gradlew.bat

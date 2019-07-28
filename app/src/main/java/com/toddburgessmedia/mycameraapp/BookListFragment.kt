@@ -1,16 +1,20 @@
 package com.toddburgessmedia.mycameraapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.navArgs
 import com.toddburgessmedia.mycameraapp.model.*
 import kotlinx.android.synthetic.main.fragment_booklist.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class BookListFragment : Fragment() {
+
+    val args : BookListFragmentArgs by navArgs()
 
     val viewModel : CameraViewModel by sharedViewModel()
 
@@ -47,13 +51,15 @@ class BookListFragment : Fragment() {
 
         var bookUpdate: BookUpdate? = null
 
-        if (savedInstanceState == null) {
-            bookUpdate = NewUser
-        } else {
-            val bundle = arguments
-            bookUpdate = arguments?.getParcelable("bookupdate") as BookUpdate
-        }
+//        if (savedInstanceState == null) {
+//            bookUpdate = NewUser
+//        } else {
+            bookUpdate = args.booklist
+            //val bundle = arguments
+//            bookUpdate = arguments?.getParcelable("bookupdate") as BookUpdate
+//        }
 
+        Log.d("mycamera","booklist ${bookUpdate.toString()}")
         return bookUpdate
 
     }
