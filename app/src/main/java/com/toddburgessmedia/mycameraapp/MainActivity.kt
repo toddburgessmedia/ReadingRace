@@ -46,6 +46,21 @@ class MainActivity : AppCompatActivity() {
         navControl = Navigation.findNavController(this,R.id.nav_first_fragment)
 
 
+
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        fcmMessaging.addAllSubcriptions()
+
+        if (user != null) {
+            viewModel.checkUserExists(user?.uid)
+        } else {
+            loginNewUser()
+        }
+
         viewModel.bookUpdateObserver.observe(this, Observer<BookUpdate> { bookUpdate ->
 
             when (bookUpdate) {
@@ -61,32 +76,14 @@ class MainActivity : AppCompatActivity() {
                 is CameraStart -> { startCamera() }
             }
         })
-
-//        if (user != null) {
-//            viewModel.checkUserExists(user?.uid)
-//        } else {
-//            loginNewUser()
-//        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        fcmMessaging.addAllSubcriptions()
-
-        if (user != null) {
-            viewModel.checkUserExists(user?.uid)
-        } else {
-            loginNewUser()
-        }
     }
 
     private fun startCamera() {
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.frame_layout, cameraFragment)
-            .commit()
+        if (navControl.currentDestination?.id != R.id.cameraFragment) {
+            navControl.navigate(R.id.action_booklist_destination_to_cameraFragment)
+        }
+
     }
 
 
@@ -141,10 +138,14 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("mycamera","we need to register")
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.frame_layout, LoginFragment.newInstance(bundle))
-            .commit()
+        //val action =  MainBlankFragmentDirections.actionHomeDestToLoginFragment()
+
+        navControl.navigate(R.id.action_home_dest_to_loginFragment,bundle)
+
+//        supportFragmentManager
+//            .beginTransaction()
+//            .replace(R.id.frame_layout, LoginFragment.newInstance(bundle))
+//            .commit()
     }
 
 }

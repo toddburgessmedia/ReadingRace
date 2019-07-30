@@ -2,6 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/main_navigation"
             app:startDestination="@+id/home_dest">
 
             <fragment
@@ -10,7 +11,13 @@
                 android:label="Blank">
                 <action
                         android:id="@+id/blank_to_booklist"
+                        app:launchSingleTop="true"
+                        app:popUpTo="@id/main_navigation"
+                        app:popUpToInclusive="true"
                         app:destination="@id/booklist_destination" />
+                <action
+                    android:id="@+id/action_home_dest_to_loginFragment"
+                    app:destination="@id/loginFragment" />
             </fragment>
             <fragment
                 android:id="@+id/booklist_destination"
@@ -20,7 +27,26 @@
                 <argument
                     android:name="booklist"
                     app:argType="com.toddburgessmedia.mycameraapp.model.BookUpdate" />
+                <action
+                    android:id="@+id/action_booklist_destination_to_cameraFragment"
+                    app:destination="@id/cameraFragment" />
             </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.toddburgessmedia.mycameraapp.LoginFragment"
+        android:label="LoginFragment" >
+        <action
+            android:id="@+id/action_loginFragment_to_booklist_destination"
+            app:destination="@id/booklist_destination" />
+    </fragment>
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.toddburgessmedia.mycameraapp.CameraFragment"
+        android:label="CameraFragment">
+        <action
+            android:id="@+id/action_cameraFragment_to_booklist_destination"
+            app:destination="@id/booklist_destination" />
+    </fragment>
 
 
 </navigation>
