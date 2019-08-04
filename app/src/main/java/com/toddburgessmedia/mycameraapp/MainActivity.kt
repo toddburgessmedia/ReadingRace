@@ -10,6 +10,7 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
+import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -23,6 +24,7 @@ import com.toddburgessmedia.mycameraapp.model.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
+import java.lang.RuntimeException
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,17 +45,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        navControl = Navigation.findNavController(this,R.id.nav_first_fragment)
-
-
-
-
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        fcmMessaging.addAllSubcriptions()
+        navControl = findNavController(R.id.nav_first_fragment)
 
         if (user != null) {
             viewModel.checkUserExists(user?.uid)
@@ -78,6 +70,34 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        fcmMessaging.addAllSubcriptions()
+
+//        if (user != null) {
+//            viewModel.checkUserExists(user?.uid)
+//        } else {
+//            loginNewUser()
+//        }
+//
+//        viewModel.bookUpdateObserver.observe(this, Observer<BookUpdate> { bookUpdate ->
+//
+//            when (bookUpdate) {
+//                is NewUser -> startLogin(bookUpdate)
+//                is RegisterUser -> registerUser()
+//                is ReadingUpdate -> startLogin(bookUpdate)
+//            }
+//        })
+//
+//        viewModel.cameraObserver.observe(this, Observer<CameraAction> {
+//
+//            when (it) {
+//                is CameraStart -> { startCamera() }
+//            }
+//        })
+    }
+
     private fun startCamera() {
 
         if (navControl.currentDestination?.id != R.id.cameraFragment) {
@@ -92,10 +112,17 @@ class MainActivity : AppCompatActivity() {
         Log.d("mycamera","starting login")
         Log.d("mycamera",bookUpdate.toString())
 
-        if (navControl.currentDestination?.id != R.id.booklist_destination) {
-            val action = MainBlankFragmentDirections.blankToBooklist(bookUpdate)
-            navControl.navigate(action)
+
+        var action : NavDirections
+
+        when (navControl.currentDestination?.id) {
+
+            R.id.home_dest -> {action = MainBlankFragmentDirections.blankToBooklist(bookUpdate)}
+            R.id.loginFragment -> {action = LoginFragmentDirections.actionLoginFragmentToBooklistDestination(bookUpdate)}
+            else -> {throw RuntimeException("Broken Navigation")}
         }
+
+        navControl.navigate(action)
     }
 
     fun loginNewUser() {
@@ -108,7 +135,7 @@ class MainActivity : AppCompatActivity() {
             AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setIsSmartLockEnabled(false)
-                .setAvailableProviders(providers)
+                .setAvailableProviders(providers.toMutableList())
                 .build(),
             RC_SIGN_IN)
     }

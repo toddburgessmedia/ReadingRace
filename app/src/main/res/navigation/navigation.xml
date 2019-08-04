@@ -5,39 +5,46 @@
             android:id="@+id/main_navigation"
             app:startDestination="@+id/home_dest">
 
-            <fragment
-                android:id="@+id/home_dest"
-                android:name="com.toddburgessmedia.mycameraapp.MainBlankFragment"
-                android:label="Blank">
-                <action
-                        android:id="@+id/blank_to_booklist"
-                        app:launchSingleTop="true"
-                        app:popUpTo="@id/main_navigation"
-                        app:popUpToInclusive="true"
-                        app:destination="@id/booklist_destination" />
-                <action
-                    android:id="@+id/action_home_dest_to_loginFragment"
-                    app:destination="@id/loginFragment" />
-            </fragment>
-            <fragment
-                android:id="@+id/booklist_destination"
-                android:name="com.toddburgessmedia.mycameraapp.BookListFragment"
-                android:label="BookList"
-                >
-                <argument
-                    android:name="booklist"
-                    app:argType="com.toddburgessmedia.mycameraapp.model.BookUpdate" />
-                <action
-                    android:id="@+id/action_booklist_destination_to_cameraFragment"
-                    app:destination="@id/cameraFragment" />
-            </fragment>
+    <fragment
+        android:id="@+id/home_dest"
+        android:name="com.toddburgessmedia.mycameraapp.MainBlankFragment"
+        android:label="Blank">
+        <action
+            android:id="@+id/blank_to_booklist"
+            app:destination="@id/booklist_destination"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/home_dest"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_home_dest_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/home_dest"
+            app:popUpToInclusive="true"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/booklist_destination"
+        android:name="com.toddburgessmedia.mycameraapp.BookListFragment"
+        android:label="BookList"
+        >
+        <argument
+            android:name="booklist"
+            app:argType="com.toddburgessmedia.mycameraapp.model.BookUpdate"
+            />
+        <action
+            android:id="@+id/action_booklist_destination_to_cameraFragment"
+            app:destination="@id/cameraFragment" />
+    </fragment>
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.toddburgessmedia.mycameraapp.LoginFragment"
         android:label="LoginFragment" >
         <action
             android:id="@+id/action_loginFragment_to_booklist_destination"
-            app:destination="@id/booklist_destination" />
+            app:destination="@id/booklist_destination"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"
+            />
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"
