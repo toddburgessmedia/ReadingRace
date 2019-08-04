@@ -74,28 +74,6 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
 
         fcmMessaging.addAllSubcriptions()
-
-//        if (user != null) {
-//            viewModel.checkUserExists(user?.uid)
-//        } else {
-//            loginNewUser()
-//        }
-//
-//        viewModel.bookUpdateObserver.observe(this, Observer<BookUpdate> { bookUpdate ->
-//
-//            when (bookUpdate) {
-//                is NewUser -> startLogin(bookUpdate)
-//                is RegisterUser -> registerUser()
-//                is ReadingUpdate -> startLogin(bookUpdate)
-//            }
-//        })
-//
-//        viewModel.cameraObserver.observe(this, Observer<CameraAction> {
-//
-//            when (it) {
-//                is CameraStart -> { startCamera() }
-//            }
-//        })
     }
 
     private fun startCamera() {
