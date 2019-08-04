@@ -143,14 +143,8 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("mycamera","we need to register")
 
-        //val action =  MainBlankFragmentDirections.actionHomeDestToLoginFragment()
-
         navControl.navigate(R.id.action_home_dest_to_loginFragment,bundle)
 
-//        supportFragmentManager
-//            .beginTransaction()
-//            .replace(R.id.frame_layout, LoginFragment.newInstance(bundle))
-//            .commit()
     }
 
 }
