@@ -5,21 +5,20 @@ import androidx.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.toddburgessmedia.mycameraapp.firebase.FCMManager
 import com.toddburgessmedia.mycameraapp.model.*
+import com.toddburgessmedia.mycameraapp.view.CameraFragment
+import com.toddburgessmedia.mycameraapp.view.CameraFragmentDirections
+import com.toddburgessmedia.mycameraapp.view.LoginFragmentDirections
+import com.toddburgessmedia.mycameraapp.view.MainBlankFragmentDirections
 
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
@@ -66,6 +65,7 @@ class MainActivity : AppCompatActivity() {
 
             when (it) {
                 is CameraStart -> { startCamera() }
+                else -> {throw RuntimeException("Illegal Camera State")}
             }
         })
     }
@@ -124,7 +124,6 @@ class MainActivity : AppCompatActivity() {
 
         if ((requestCode == RC_SIGN_IN) && (resultCode == Activity.RESULT_OK)) {
             user = auth.currentUser
-            Log.d("mycamera","we are signed in")
             viewModel.checkUserExists(user?.uid)
         } else {
             Snackbar.make(
@@ -141,8 +140,6 @@ class MainActivity : AppCompatActivity() {
         bundle.putString("name", user?.displayName)
         bundle.putString("email", user?.email)
         bundle.putString("uid", user?.uid)
-
-        Log.d("mycamera","we need to register")
 
         navControl.navigate(R.id.action_home_dest_to_loginFragment,bundle)
 

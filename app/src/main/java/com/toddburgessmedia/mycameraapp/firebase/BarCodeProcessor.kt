@@ -1,4 +1,4 @@
-package com.toddburgessmedia.mycameraapp
+package com.toddburgessmedia.mycameraapp.firebase
 
 import android.util.Log
 import com.google.firebase.ml.vision.FirebaseVision

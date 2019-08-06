@@ -1,4 +1,4 @@
-package com.toddburgessmedia.mycameraapp
+package com.toddburgessmedia.mycameraapp.view
 
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
+import com.toddburgessmedia.mycameraapp.CameraViewModel
+import com.toddburgessmedia.mycameraapp.R
 import com.toddburgessmedia.mycameraapp.model.*
 import kotlinx.android.synthetic.main.fragment_booklist.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel

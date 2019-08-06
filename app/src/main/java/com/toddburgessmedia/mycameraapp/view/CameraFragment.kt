@@ -1,4 +1,4 @@
-package com.toddburgessmedia.mycameraapp
+package com.toddburgessmedia.mycameraapp.view
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.otaliastudios.cameraview.CameraListener
+import com.toddburgessmedia.mycameraapp.CameraViewModel
+import com.toddburgessmedia.mycameraapp.R
 import kotlinx.android.synthetic.main.camera_layout.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 

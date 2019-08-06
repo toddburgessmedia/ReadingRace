@@ -1,11 +1,11 @@
-package com.toddburgessmedia.mycameraapp
+package com.toddburgessmedia.mycameraapp.view
 
 import androidx.recyclerview.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.squareup.picasso.Picasso
+import com.toddburgessmedia.mycameraapp.R
 import com.toddburgessmedia.mycameraapp.model.Book
 import kotlinx.android.synthetic.main.booklist_adapter.view.*
 
@@ -45,8 +45,8 @@ class BookListAdapter(val booklist : List<Book>) : RecyclerView.Adapter<BookList
     override fun getItemCount(): Int = books.size
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): BookViewHolder =
-        BookViewHolder(LayoutInflater.from(parent.context)
-                    .inflate(R.layout.booklist_adapter,parent,false))
+            BookViewHolder(LayoutInflater.from(parent.context)
+                    .inflate(R.layout.booklist_adapter, parent, false))
 
     class BookViewHolder(v : View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v) {
 
