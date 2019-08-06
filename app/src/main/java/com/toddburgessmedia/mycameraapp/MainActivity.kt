@@ -97,6 +97,7 @@ class MainActivity : AppCompatActivity() {
 
             R.id.home_dest -> {action = MainBlankFragmentDirections.blankToBooklist(bookUpdate)}
             R.id.loginFragment -> {action = LoginFragmentDirections.actionLoginFragmentToBooklistDestination(bookUpdate)}
+            R.id.cameraFragment -> {action = CameraFragmentDirections.actionCameraFragmentToBooklistDestination(bookUpdate)}
             else -> {throw RuntimeException("Broken Navigation")}
         }
 
