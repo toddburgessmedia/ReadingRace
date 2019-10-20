@@ -7,11 +7,11 @@ apply plugin: 'androidx.navigation.safeargs'
 //apply plugin: 'io.fabric'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.toddburgessmedia.mycameraapp"
         minSdkVersion 26
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -59,8 +59,8 @@ dependencies {
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    implementation 'com.google.firebase:firebase-core:17.0.1'
-    implementation 'com.google.firebase:firebase-ml-vision:22.0.0'
+    implementation 'com.google.firebase:firebase-core:17.1.0'
+    implementation 'com.google.firebase:firebase-ml-vision:23.0.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
 
     implementation "com.squareup.moshi:moshi:1.8.0"
@@ -77,14 +77,14 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
 
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
-    implementation 'com.google.firebase:firebase-auth:18.1.0'
+    implementation 'com.google.firebase:firebase-auth:19.0.0'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
 
     implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
     implementation "io.reactivex.rxjava2:rxandroid:2.0.1"
 
-    implementation 'com.google.firebase:firebase-messaging:19.0.1'
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
 
     // Kotlin
     implementation "androidx.navigation:navigation-fragment-ktx:2.0.0"
@@ -92,7 +92,7 @@ dependencies {
 
 
 //    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
-    implementation 'com.google.firebase:firebase-firestore:20.2.0'
+    implementation 'com.google.firebase:firebase-firestore:21.0.0'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.0.0'
     implementation 'androidx.navigation:navigation-ui-ktx:2.0.0'
 

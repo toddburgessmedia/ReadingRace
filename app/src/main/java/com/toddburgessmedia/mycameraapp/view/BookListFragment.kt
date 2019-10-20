@@ -20,8 +20,6 @@ class BookListFragment : Fragment() {
 
     val viewModel : CameraViewModel by sharedViewModel()
 
-//    var adapter : BookListAdapter? = null
-
     companion object {
 
         fun newInstance(bookUpdate: BookUpdate) : BookListFragment {
@@ -53,15 +51,8 @@ class BookListFragment : Fragment() {
 
         var bookUpdate: BookUpdate? = null
 
-//        if (savedInstanceState == null) {
-//            bookUpdate = NewUser
-//        } else {
             bookUpdate = args.booklist
-            //val bundle = arguments
-//            bookUpdate = arguments?.getParcelable("bookupdate") as BookUpdate
-//        }
 
-        Log.d("mycamera","booklist ${bookUpdate.toString()}")
         return bookUpdate
 
     }

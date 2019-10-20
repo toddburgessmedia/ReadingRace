@@ -11,7 +11,7 @@ import com.toddburgessmedia.mycameraapp.R
 
 class ReadingRaceMessagingService : FirebaseMessagingService() {
 
-    override fun onMessageReceived(message: RemoteMessage?) {
+    override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
         val channelID = this.getString(R.string.default_notification_channel_id)
