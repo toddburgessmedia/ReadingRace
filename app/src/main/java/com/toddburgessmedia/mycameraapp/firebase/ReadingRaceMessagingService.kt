@@ -15,14 +15,14 @@ class ReadingRaceMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(message)
 
         val channelID = this.getString(R.string.default_notification_channel_id)
-        val title = message?.notification?.title
+        val title = message.notification?.title
 
         val channel = NotificationChannel(channelID,title,NotificationManager.IMPORTANCE_DEFAULT)
-        channel.description = message?.notification?.body
+        channel.description = message.notification?.body
 
         val builder = NotificationCompat.Builder(this,channelID)
             .setContentTitle(title)
-            .setContentText(message?.notification?.body)
+            .setContentText(message.notification?.body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setStyle(NotificationCompat.BigTextStyle())
             .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
