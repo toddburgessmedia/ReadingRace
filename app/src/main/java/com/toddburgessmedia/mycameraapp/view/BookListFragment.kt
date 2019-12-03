@@ -20,6 +20,8 @@ class BookListFragment : Fragment() {
 
     val viewModel : CameraViewModel by sharedViewModel()
 
+    val clickListener : (View) -> Unit = { Log.d("mycamera","we just clicked!!!!") }
+
     companion object {
 
         fun newInstance(bookUpdate: BookUpdate) : BookListFragment {
@@ -68,7 +70,7 @@ class BookListFragment : Fragment() {
                 booklist_rv.visibility = View.VISIBLE
                 booklist_text.visibility = View.GONE
 
-                val adapter = BookListAdapter(bookUpdate.libraryList)
+                val adapter = BookListAdapter(bookUpdate.libraryList,clickListener)
                 booklist_rv.layoutManager = LinearLayoutManager(activity)
                 booklist_rv.adapter = adapter
 
