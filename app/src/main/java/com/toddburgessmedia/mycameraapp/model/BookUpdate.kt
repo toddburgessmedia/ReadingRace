@@ -17,4 +17,7 @@ object NewUser : BookUpdate()
 @Parcelize
 object RegisterUser : BookUpdate()
 
+@Parcelize
+data class BookDetail(val item: Item) : BookUpdate()
+
 

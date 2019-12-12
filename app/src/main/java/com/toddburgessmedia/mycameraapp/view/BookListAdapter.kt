@@ -11,13 +11,7 @@ import com.toddburgessmedia.mycameraapp.model.Book
 import com.toddburgessmedia.mycameraapp.model.Item
 import kotlinx.android.synthetic.main.booklist_adapter.view.*
 
-class BookListAdapter(val booklist : List<Book>) : RecyclerView.Adapter<BookListAdapter.BookViewHolder>() {
-
-    var click : (View) -> Unit = { Log.d("mycamera", "blah!") }
-
-    constructor(booklist: List<Book>, clickListener : (v : View) -> Unit) : this(booklist) {
-        //click = clickListener
-    }
+class BookListAdapter(val booklist : List<Book>,val clickListener: (Item) -> Unit) : RecyclerView.Adapter<BookListAdapter.BookViewHolder>() {
 
     val books = mutableListOf<Book>()
 
@@ -29,7 +23,8 @@ class BookListAdapter(val booklist : List<Book>) : RecyclerView.Adapter<BookList
     override fun onBindViewHolder(holder: BookViewHolder, index: Int) {
 
         val item = books[index].items[0]
-        holder.bind(item)
+        holder.bind(item,clickListener)
+
     }
 
     override fun getItemCount(): Int = books.size
@@ -48,7 +43,7 @@ class BookListAdapter(val booklist : List<Book>) : RecyclerView.Adapter<BookList
         val image = v.booklist_cover
 
 
-        fun bind(item : Item) {
+        fun bind(item : Item,clickListener: (Item) -> Unit) {
             author.setText(createAuthors(item.volumeInfo?.authors))
             title.setText(item.volumeInfo?.title)
             pagecount.setText("${item.volumeInfo?.pageCount?.toString()} pages")
@@ -58,7 +53,8 @@ class BookListAdapter(val booklist : List<Book>) : RecyclerView.Adapter<BookList
                 .load(item.volumeInfo?.imageLinks?.thumbnail)
                 .into(image)
 
-            view.setOnClickListener { Log.d("mycamera","click") }
+            //val listener : (View, Item) -> { v,i -> Log.d("mycamera","click ${}") }
+            view.setOnClickListener { clickListener(item) }
         }
 
         private fun createAuthors(authors : List<String>?) : String {

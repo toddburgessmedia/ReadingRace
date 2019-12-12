@@ -20,7 +20,7 @@ class BookListFragment : Fragment() {
 
     val viewModel : CameraViewModel by sharedViewModel()
 
-    val clickListener : (View) -> Unit = { Log.d("mycamera","we just clicked!!!!") }
+    val clickListener : (Item) -> Unit = {item -> viewModel.getBookDetail(item)}
 
     companion object {
 
