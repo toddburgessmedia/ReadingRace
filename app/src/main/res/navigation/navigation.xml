@@ -34,6 +34,9 @@
         <action
             android:id="@+id/action_booklist_destination_to_cameraFragment"
             app:destination="@id/cameraFragment" />
+        <action
+            android:id="@+id/action_booklist_to_bookInfoFragment"
+            app:destination="@id/bookInfoFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -53,6 +56,14 @@
         <action
             android:id="@+id/action_cameraFragment_to_booklist_destination"
             app:destination="@id/booklist_destination" />
+    </fragment>
+    <fragment
+            android:id="@+id/bookInfoFragment"
+            android:name="com.toddburgessmedia.mycameraapp.view.BookInfoFragment"
+            android:label="BookInfoFragment">
+        <argument
+            android:name="book"
+            app:argType="com.toddburgessmedia.mycameraapp.model.BookDetail" />
     </fragment>
 
 

@@ -15,10 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.toddburgessmedia.mycameraapp.firebase.FCMManager
 import com.toddburgessmedia.mycameraapp.model.*
-import com.toddburgessmedia.mycameraapp.view.CameraFragment
-import com.toddburgessmedia.mycameraapp.view.CameraFragmentDirections
-import com.toddburgessmedia.mycameraapp.view.LoginFragmentDirections
-import com.toddburgessmedia.mycameraapp.view.MainBlankFragmentDirections
+import com.toddburgessmedia.mycameraapp.view.*
 
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
@@ -58,6 +55,7 @@ class MainActivity : AppCompatActivity() {
                 is NewUser -> startLogin(bookUpdate)
                 is RegisterUser -> registerUser()
                 is ReadingUpdate -> startLogin(bookUpdate)
+                is BookDetail -> showBookDetail(bookUpdate)
             }
         })
 
@@ -143,6 +141,11 @@ class MainActivity : AppCompatActivity() {
 
         navControl.navigate(R.id.action_home_dest_to_loginFragment,bundle)
 
+    }
+
+    private fun showBookDetail(bookDetail : BookDetail) {
+        val action = BookListFragmentDirections.actionBooklistToBookInfoFragment(bookDetail)
+        navControl.navigate(action)
     }
 
 }

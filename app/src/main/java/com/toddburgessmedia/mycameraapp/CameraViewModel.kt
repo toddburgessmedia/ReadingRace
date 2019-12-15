@@ -140,7 +140,7 @@ class CameraViewModel(val firestore : FireStoreModel, val analytics: ReadingRace
 
     fun getBookDetail(item : Item) {
         Log.d("mycamera", "ModelView here!!! ${item.volumeInfo?.title}")
-//        bookUpdateObserver.postValue(BookDetail(item))
+        bookUpdateObserver.postValue(BookDetail(item))
     }
 
 }
