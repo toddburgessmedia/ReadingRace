@@ -9,6 +9,10 @@ import kotlinx.android.parcel.Parcelize
 data class ImageLink (
 
     val smallThumbnail : String? = null,
-    val thumbnail : String? = null
+    val thumbnail : String? = null,
+    val small : String? = null,
+    val medium : String? = null,
+    val large : String? = null,
+    val extraLarge : String? = null
 
 ) : Parcelable
