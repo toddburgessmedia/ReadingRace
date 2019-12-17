@@ -142,4 +142,17 @@ class CameraViewModel(val firestore : FireStoreModel, val analytics: ReadingRace
         bookUpdateObserver.postValue(BookDetail(item))
     }
 
+    fun deleteBook(item: Item) {
+
+        val result = firestore.deleteBookForUser(item)
+            .andThen(firestore.getAllBooksReading())
+            .subscribe ({ bookList ->
+                bookUpdateObserver.postValue(ReadingUpdate(bookList))},
+                {
+                        error -> Log.d("mycamera","could not delete ${item.id}")
+                })
+                
+        disposables.add(result)
+    }
+
 }

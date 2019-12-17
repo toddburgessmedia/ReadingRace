@@ -57,6 +57,7 @@ class BookInfoFragment : Fragment() {
                 authorList += "$author, "
             }
         }
-        return authorList.substring(0,authorList.length-2)
+        //return authorList.substring(0,authorList.length-2)
+        return authorList.trim(',')
     }
 }

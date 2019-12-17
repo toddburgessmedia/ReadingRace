@@ -205,4 +205,20 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
         }
 
     }
+
+    fun deleteBookForUser (item : Item) : Completable {
+
+        return Completable.create { emitter ->
+            item.id?.let { book ->
+                db.collection("books").document(book)
+                    .delete()
+                    .addOnSuccessListener {
+                        emitter.onComplete()
+                    }
+                    .addOnFailureListener { error ->
+                        emitter.onError(error)
+                    }
+            }
+        }
+    }
 }
