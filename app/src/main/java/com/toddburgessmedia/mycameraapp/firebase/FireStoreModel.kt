@@ -221,4 +221,20 @@ class FireStoreModel(val db : FirebaseFirestore) : CoroutineScope {
             }
         }
     }
+
+    fun deleteBookFromReadingList (item : Item) : Completable {
+
+        return Completable.create {emitter ->
+            item.id?.let { book ->
+                val userDB = db.collection("readers").document(currentUser?.uid!!)
+                userDB.update("booksReading", FieldValue.arrayRemove(item.id))
+                    .addOnSuccessListener {
+                        emitter.onComplete()
+                    }
+                    .addOnFailureListener{
+                        emitter.onError(it)
+                    }
+            }
+        }
+    }
 }

@@ -23,6 +23,7 @@ class CameraViewModel(val firestore : FireStoreModel, val analytics: ReadingRace
     val cameraObserver = MutableLiveData<CameraAction>()
 
     val bookUpdateObserver = MutableLiveData<BookUpdate>()
+    val bookListFragmentObserver = MutableLiveData<ReadingUpdate>()
 
     val disposables = CompositeDisposable()
 
@@ -145,13 +146,14 @@ class CameraViewModel(val firestore : FireStoreModel, val analytics: ReadingRace
     fun deleteBook(item: Item) {
 
         val result = firestore.deleteBookForUser(item)
+            .andThen(firestore.deleteBookFromReadingList(item))
             .andThen(firestore.getAllBooksReading())
             .subscribe ({ bookList ->
-                bookUpdateObserver.postValue(ReadingUpdate(bookList))},
+                bookListFragmentObserver.postValue(ReadingUpdate(bookList))},
                 {
                         error -> Log.d("mycamera","could not delete ${item.id}")
                 })
-                
+
         disposables.add(result)
     }
 

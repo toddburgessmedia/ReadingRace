@@ -106,6 +106,7 @@ class MainActivity : AppCompatActivity() {
 
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
+            AuthUI.IdpConfig.AnonymousBuilder().build(),
             AuthUI.IdpConfig.GoogleBuilder().build())
 
         startActivityForResult(

@@ -13,7 +13,9 @@ import kotlinx.android.synthetic.main.booklist_adapter.view.*
 
 class BookListAdapter(val booklist : List<Book>,val clickListener: (Item) -> Unit) : RecyclerView.Adapter<BookListAdapter.BookViewHolder>() {
 
-    val books = mutableListOf<Book>()
+    var books = mutableListOf<Book>()
+
+    var position = 0
 
     init {
         books.addAll(booklist)
@@ -24,14 +26,28 @@ class BookListAdapter(val booklist : List<Book>,val clickListener: (Item) -> Uni
 
         val item = books[index].items[0]
         holder.bind(item,clickListener)
+        holder.itemView.setOnLongClickListener {
+            position = holder.adapterPosition
+            return@setOnLongClickListener false
+        }
 
     }
 
     override fun getItemCount(): Int = books.size
 
+    fun updateBookList(newBooks : List<Book>) {
+        books.removeAll{e -> true}
+        books.addAll(newBooks)
+
+        notifyDataSetChanged()
+    }
+
+
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): BookViewHolder =
             BookViewHolder(LayoutInflater.from(parent.context)
                     .inflate(R.layout.booklist_adapter, parent, false))
+
+
 
     class BookViewHolder(v : View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v) {
 
@@ -41,7 +57,6 @@ class BookListAdapter(val booklist : List<Book>,val clickListener: (Item) -> Uni
         val author = v.booklist_author
         val pagecount = v.booklist_pages
         val image = v.booklist_cover
-
 
         fun bind(item : Item,clickListener: (Item) -> Unit) {
             author.setText(createAuthors(item.volumeInfo?.authors))
@@ -55,6 +70,12 @@ class BookListAdapter(val booklist : List<Book>,val clickListener: (Item) -> Uni
 
             //val listener : (View, Item) -> { v,i -> Log.d("mycamera","click ${}") }
             view.setOnClickListener { clickListener(item) }
+            view.isLongClickable = true
+//            view.setOnLongClickListener {
+//                Log.d("mycamera","long press")
+//                return@setOnLongClickListener true
+//            }
+
         }
 
         private fun createAuthors(authors : List<String>?) : String {
