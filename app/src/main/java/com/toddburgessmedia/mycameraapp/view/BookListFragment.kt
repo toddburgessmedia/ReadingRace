@@ -102,9 +102,6 @@ class BookListFragment : Fragment() {
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
 
-//        val adapter = booklist_rv.adapter as BookListAdapter
-//        viewModel.deleteBook(adapter.booklist[adapter.position])
-
         val builder = context?.let {
             AlertDialog.Builder(it)
         }
